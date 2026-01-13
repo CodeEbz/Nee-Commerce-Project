@@ -1,0 +1,206 @@
+[
+  {
+    "id": "biz_001",
+    "name": "Apinke Herbs",
+    "slug": "apinke-herbs",
+    "category": "Wellness",
+    "description": "Premium herbal teas and natural remedies for your wellness journey. We specialize in organic, locally-sourced herbs that promote holistic health and vitality.",
+    "whatsapp_link": "https://wa.me/c/2348027550551",
+    "hero_image": "https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&fit=crop&q=80&w=1200",
+    "logo": "https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?auto=format&fit=crop&q=80&w=200",
+    "featured": true,
+    "products": [
+      {
+        "code": "HERB001",
+        "whatsapp_id": "8934756201",
+        "name": "Slim Tea Detox",
+        "price": 5000,
+        "description": "A 14-day detox tea blend to help cleanse your system naturally with premium organic herbs.",
+        "image": "https://images.unsplash.com/photo-1597318181409-cf64d0b5d8a5?auto=format&fit=crop&q=80&w=800",
+        "featured": true
+      },
+      {
+        "code": "HERB003",
+        "whatsapp_id": "8934756203",
+        "name": "Natural Honey",
+        "price": 6000,
+        "description": "Pure organic honey with natural health benefits, sourced from local beekeepers.",
+        "image": "https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&q=80&w=800",
+        "featured": true
+      },
+      {
+        "code": "HERB004",
+        "whatsapp_id": "8934756204",
+        "name": "Turmeric Ginger Blend",
+        "price": 4500,
+        "description": "Anti-inflammatory herbal blend perfect for daily wellness routine.",
+        "image": "https://images.unsplash.com/photo-1609501676725-7186f734b2b0?auto=format&fit=crop&q=80&w=800",
+        "featured": false
+      }
+    ]
+  },
+  {
+    "id": "biz_003",
+    "name": "Luxe Hair Studio",
+    "slug": "luxe-hair",
+    "category": "Beauty",
+    "description": "High-quality human hair extensions, wigs, and premium hair care products for the modern woman. Transform your look with our luxury collection.",
+    "whatsapp_link": "https://wa.me/c/2347000000000",
+    "hero_image": "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&q=80&w=1200",
+    "logo": "https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?auto=format&fit=crop&q=80&w=200",
+    "featured": true,
+    "products": [
+      {
+        "code": "HAIR001",
+        "whatsapp_id": "9928374650",
+        "name": "Bone Straight Wig",
+        "price": 85000,
+        "description": "Premium 20-inch bone straight human hair wig. Sleek, natural, and durable for everyday glamour.",
+        "image": "https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?auto=format&fit=crop&q=80&w=800",
+        "featured": true
+      },
+      {
+        "code": "HAIR002",
+        "whatsapp_id": "9928374651",
+        "name": "Curly Lace Front Wig",
+        "price": 95000,
+        "description": "Natural curly lace front wig with baby hairs for a seamless look.",
+        "image": "https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?auto=format&fit=crop&q=80&w=800",
+        "featured": true
+      }
+    ]
+  },
+  {
+    "id": "biz_004",
+    "name": "Urban Fashion Hub",
+    "slug": "urban-fashion",
+    "category": "Fashion",
+    "description": "Stay ahead of the trends with our curated collection of affordable and stylish streetwear. Express your unique style with confidence.",
+    "whatsapp_link": "https://wa.me/c/2347012345678",
+    "hero_image": "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&q=80&w=1200",
+    "logo": "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?auto=format&fit=crop&q=80&w=200",
+    "featured": true,
+    "products": [
+      {
+        "code": "FASH001",
+        "whatsapp_id": "1122334455",
+        "name": "Premium Oversized Tee",
+        "price": 7500,
+        "description": "Soft cotton oversized t-shirt in vintage wash black. Perfect for casual streetwear looks.",
+        "image": "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&q=80&w=800",
+        "featured": true
+      },
+      {
+        "code": "FASH002",
+        "whatsapp_id": "1122334456",
+        "name": "Classic Denim Jacket",
+        "price": 15000,
+        "description": "Timeless denim jacket with a modern fit. A wardrobe essential for any season.",
+        "image": "https://images.unsplash.com/photo-1543076447-215ad9ba6923?auto=format&fit=crop&q=80&w=800",
+        "featured": false
+      },
+      {
+        "code": "FASH003",
+        "whatsapp_id": "1122334457",
+        "name": "Designer Sneakers",
+        "price": 25000,
+        "description": "Limited edition designer sneakers with premium materials and comfort.",
+        "image": "https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&q=80&w=800",
+        "featured": true
+      }
+    ]
+  },
+  {
+    "id": "biz_002",
+    "name": "Fresh Mart Organics",
+    "slug": "fresh-mart",
+    "category": "Groceries",
+    "description": "Fresh farm produce delivered to your door. Supporting local farmers while bringing you the finest organic fruits and vegetables.",
+    "whatsapp_link": "https://wa.me/c/2349012345678",
+    "hero_image": "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=1200",
+    "logo": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&q=80&w=200",
+    "featured": false,
+    "products": [
+      {
+        "code": "GROC001",
+        "whatsapp_id": "7721948563",
+        "name": "Organic Tomato Basket",
+        "price": 4500,
+        "description": "Fresh, sun-ripened organic tomatoes grown without pesticides.",
+        "image": "https://images.unsplash.com/photo-1518977676601-b53f02ac6d31?auto=format&fit=crop&q=80&w=800",
+        "featured": false
+      },
+      {
+        "code": "GROC002",
+        "whatsapp_id": "7721948564",
+        "name": "Mixed Vegetable Box",
+        "price": 8500,
+        "description": "Weekly selection of fresh seasonal vegetables from local farms.",
+        "image": "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&q=80&w=800",
+        "featured": true
+      }
+    ]
+  },
+  {
+    "id": "biz_005",
+    "name": "Iron Temple Fitness",
+    "slug": "iron-temple",
+    "category": "Fitness",
+    "description": "Premium fitness equipment and workout gear for the dedicated athlete. Build your home gym with professional-grade equipment.",
+    "whatsapp_link": "https://wa.me/c/234800GYMSHOP",
+    "hero_image": "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=80&w=1200",
+    "logo": "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&q=80&w=200",
+    "featured": true,
+    "products": [
+      {
+        "code": "GYM001",
+        "whatsapp_id": "4433221100",
+        "name": "Adjustable Dumbbells",
+        "price": 45000,
+        "description": "Pro-grade adjustable dumbbells, up to 24kg each. Perfect for home workouts.",
+        "image": "https://images.unsplash.com/photo-1583454110551-21f2fa20019b?auto=format&fit=crop&q=80&w=800",
+        "featured": true
+      },
+      {
+        "code": "GYM002",
+        "whatsapp_id": "4433221101",
+        "name": "Resistance Band Set",
+        "price": 12000,
+        "description": "Complete resistance band set with multiple resistance levels and accessories.",
+        "image": "https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?auto=format&fit=crop&q=80&w=800",
+        "featured": true
+      }
+    ]
+  },
+  {
+    "id": "biz_006",
+    "name": "TechHub Electronics",
+    "slug": "techhub-electronics",
+    "category": "Electronics",
+    "description": "Latest gadgets and electronics at competitive prices. From smartphones to smart home devices, we have it all.",
+    "whatsapp_link": "https://wa.me/c/2348123456789",
+    "hero_image": "https://images.unsplash.com/photo-1498049794561-7780e7231661?auto=format&fit=crop&q=80&w=1200",
+    "logo": "https://images.unsplash.com/photo-1531297484001-80022131f5a1?auto=format&fit=crop&q=80&w=200",
+    "featured": true,
+    "products": [
+      {
+        "code": "TECH001",
+        "whatsapp_id": "5544332211",
+        "name": "Wireless Earbuds Pro",
+        "price": 35000,
+        "description": "Premium wireless earbuds with noise cancellation and 24-hour battery life.",
+        "image": "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?auto=format&fit=crop&q=80&w=800",
+        "featured": true
+      },
+      {
+        "code": "TECH002",
+        "whatsapp_id": "5544332212",
+        "name": "Smart Watch Series X",
+        "price": 75000,
+        "description": "Advanced smartwatch with health monitoring and GPS tracking.",
+        "image": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=80&w=800",
+        "featured": true
+      }
+    ]
+  }
+]
