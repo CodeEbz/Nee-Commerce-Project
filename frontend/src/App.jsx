@@ -6,6 +6,7 @@ import Landing from './pages/Landing'
 import Businesses from './pages/Businesses'
 import BusinessDetail from './pages/BusinessDetail'
 import Admin from './pages/Admin'
+import Header from './components/Header'
 
 function App() {
   const [cart, setCart] = useState([]);
@@ -15,8 +16,8 @@ function App() {
   const addToCart = (product) => {
     const existingItem = cart.find(item => item.code === product.code);
     if (existingItem) {
-      setCart(cart.map(item => 
-        item.code === product.code 
+      setCart(cart.map(item =>
+        item.code === product.code
           ? { ...item, quantity: item.quantity + 1 }
           : item
       ));
@@ -35,8 +36,8 @@ function App() {
       removeFromCart(productCode);
       return;
     }
-    setCart(cart.map(item => 
-      item.code === productCode 
+    setCart(cart.map(item =>
+      item.code === productCode
         ? { ...item, quantity: newQuantity }
         : item
     ));
@@ -80,32 +81,17 @@ function App() {
   return (
     <Router>
       <div className="app-container">
-        {/* Cart Badge */}
-        {cart.length > 0 && (
-          <div className="glass" style={{
-            position: 'fixed',
-            top: '2rem',
-            right: '2rem',
-            zIndex: 1000,
-            padding: '0.75rem 1.5rem',
-            borderRadius: 'var(--radius-full)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '1rem',
-            boxShadow: 'var(--shadow-xl)',
-            cursor: 'pointer'
-          }} onClick={() => setShowCheckout(true)}>
-            <ShoppingBag size={20} color="var(--accent)" />
-            <div style={{ fontWeight: 700 }}>{cart.reduce((sum, item) => sum + item.quantity, 0)} Items</div>
-            <div style={{ width: '1px', height: '20px', background: 'rgba(0,0,0,0.1)' }}></div>
-            <div style={{ color: 'var(--accent)', fontWeight: 800 }}>₦{getTotalAmount().toLocaleString()}</div>
-            <button className="btn btn-primary" style={{ padding: '0.5rem 1rem', fontSize: '0.875rem' }}>Checkout</button>
-          </div>
-        )}
+        <Header
+          cart={cart}
+          onShowCheckout={() => setShowCheckout(true)}
+          totalAmount={getTotalAmount()}
+        />
+
+        {/* Checkout Modal */}
 
         {/* Checkout Modal */}
         {showCheckout && (
-          <CheckoutModal 
+          <CheckoutModal
             cart={cart}
             onClose={() => setShowCheckout(false)}
             onCheckout={handleCheckout}
@@ -205,7 +191,7 @@ function CheckoutModal({ cart, onClose, onCheckout, onUpdateQuantity, onRemoveIt
         {/* Customer Form */}
         <form onSubmit={handleSubmit}>
           <h3 style={{ marginBottom: '1rem' }}>Customer Information</h3>
-          
+
           <div style={{ marginBottom: '1rem' }}>
             <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>Full Name *</label>
             <div style={{ position: 'relative' }}>
@@ -213,7 +199,7 @@ function CheckoutModal({ cart, onClose, onCheckout, onUpdateQuantity, onRemoveIt
               <input
                 type="text"
                 value={customerData.customer_name}
-                onChange={(e) => setCustomerData({...customerData, customer_name: e.target.value})}
+                onChange={(e) => setCustomerData({ ...customerData, customer_name: e.target.value })}
                 style={{ width: '100%', padding: '0.75rem 0.75rem 0.75rem 2.5rem', border: '1px solid #E5E7EB', borderRadius: 'var(--radius-md)', outline: 'none' }}
                 placeholder="Enter your full name"
                 required
@@ -228,7 +214,7 @@ function CheckoutModal({ cart, onClose, onCheckout, onUpdateQuantity, onRemoveIt
               <input
                 type="email"
                 value={customerData.customer_email}
-                onChange={(e) => setCustomerData({...customerData, customer_email: e.target.value})}
+                onChange={(e) => setCustomerData({ ...customerData, customer_email: e.target.value })}
                 style={{ width: '100%', padding: '0.75rem 0.75rem 0.75rem 2.5rem', border: '1px solid #E5E7EB', borderRadius: 'var(--radius-md)', outline: 'none' }}
                 placeholder="Enter your email"
                 required
@@ -243,7 +229,7 @@ function CheckoutModal({ cart, onClose, onCheckout, onUpdateQuantity, onRemoveIt
               <input
                 type="tel"
                 value={customerData.customer_phone}
-                onChange={(e) => setCustomerData({...customerData, customer_phone: e.target.value})}
+                onChange={(e) => setCustomerData({ ...customerData, customer_phone: e.target.value })}
                 style={{ width: '100%', padding: '0.75rem 0.75rem 0.75rem 2.5rem', border: '1px solid #E5E7EB', borderRadius: 'var(--radius-md)', outline: 'none' }}
                 placeholder="Enter your phone number"
                 required
