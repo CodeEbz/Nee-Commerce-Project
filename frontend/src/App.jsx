@@ -57,22 +57,52 @@ function App() {
         payment_method: "card"
       };
 
-      const response = await fetch('http://localhost:8000/checkout', {
+      let response;
+      const checkoutOptions = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(checkoutData)
-      });
+      };
+
+      const fetchWithTimeout = async (url, options = {}, timeout = 3000) => {
+        const controller = new AbortController();
+        const id = setTimeout(() => controller.abort(), timeout);
+        try {
+          const res = await fetch(url, { ...options, signal: controller.signal });
+          clearTimeout(id);
+          return res;
+        } catch (error) {
+          clearTimeout(id);
+          throw error;
+        }
+      };
+
+      try {
+        response = await fetchWithTimeout('http://127.0.0.1:8000/payments/initialize', checkoutOptions);
+      } catch (e) {
+        console.error('Connection to backend failed:', e);
+        throw new Error('Could not connect to the server. Please ensure the backend is running.');
+      }
 
       if (response.ok) {
         const result = await response.json();
-        alert(`🎉 Order successful! Order ID: ${result.order_id}`);
-        setCart([]);
-        setShowCheckout(false);
+
+        // Handle Paystack redirect or Demo Mode
+        if (result.authorization_url) {
+          // Clear cart before redirecting so user doesn't see old items if they return
+          setCart([]);
+          window.location.href = result.authorization_url;
+        } else {
+          alert(`🎉 Order successful! Order ID: ${result.order_id}`);
+          setCart([]);
+          setShowCheckout(false);
+        }
       } else {
-        throw new Error('Checkout failed');
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Checkout failed');
       }
     } catch (error) {
-      alert('❌ Checkout failed. Please try again.');
+      alert(`❌ Checkout failed: ${error.message}`);
     } finally {
       setCheckoutLoading(false);
     }

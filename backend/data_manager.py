@@ -183,21 +183,41 @@ def load_orders() -> List[Dict]:
 
 def save_order(order_data: Dict) -> bool:
     """Appends a new order to the orders.json ledger."""
-    orders = []
-    if os.path.exists(ORDERS_FILE):
-        with open(ORDERS_FILE, "r") as f:
-            try:
-                orders = json.load(f)
-            except json.JSONDecodeError:
-                orders = []
+    orders = load_orders()
     
-    # Add timestamp and ID
-    order_data["id"] = f"ORD-{int(datetime.now().timestamp())}"
-    order_data["created_at"] = datetime.now().isoformat()
+    # Add timestamp and ID if not present
+    if "id" not in order_data:
+        order_data["id"] = f"ORD-{int(datetime.now().timestamp())}"
+    
+    if "created_at" not in order_data:
+        order_data["created_at"] = datetime.now().isoformat()
     
     orders.append(order_data)
     
-    with open(ORDERS_FILE, "w") as f:
-        json.dump(orders, f, indent=2)
+    try:
+        with open(ORDERS_FILE, "w") as f:
+            json.dump(orders, f, indent=2)
+        return True
+    except Exception:
+        return False
+
+def update_order_status(order_id: str, new_status: str) -> bool:
+    """Updates the status of an existing order by its ID."""
+    orders = load_orders()
+    updated = False
     
-    return True
+    for order in orders:
+        if order.get("id") == order_id:
+            order["status"] = new_status
+            order["updated_at"] = datetime.now().isoformat()
+            updated = True
+            break
+    
+    if updated:
+        try:
+            with open(ORDERS_FILE, "w") as f:
+                json.dump(orders, f, indent=2)
+            return True
+        except Exception:
+            return False
+    return False

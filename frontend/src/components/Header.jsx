@@ -2,6 +2,25 @@ import { Link, useLocation } from 'react-router-dom'
 import { ShoppingBag, ChevronRight, Menu, X } from 'lucide-react'
 import { useState, useEffect } from 'react'
 
+const Logo = ({ size = 40 }) => (
+  <div style={{
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: size,
+    height: size,
+    background: 'var(--primary)',
+    borderRadius: '10px',
+    padding: '4px',
+    boxShadow: '0 4px 12px rgba(15, 23, 42, 0.2)'
+  }}>
+    <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M25 75V25L50 50L75 25V75" stroke="#3B82F6" strokeWidth="12" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M40 25C40 18 44.5 12 50 12C55.5 12 60 18 60 25" stroke="#60A5FA" strokeWidth="8" strokeLinecap="round" strokeOpacity="0.7" />
+    </svg>
+  </div>
+);
+
 const Header = ({ cart, onShowCheckout, totalAmount }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -22,7 +41,7 @@ const Header = ({ cart, onShowCheckout, totalAmount }) => {
       <div className="header-container">
         {/* Logo Section */}
         <Link to="/" className="header-logo">
-          <div className="logo-icon">NC</div>
+          <Logo size={40} />
           <span className="logo-text">Nee Commerce</span>
         </Link>
 

@@ -17,7 +17,32 @@ export default function SyncStation({ onProductSynced }) {
 
     try {
       const encodedIdentifier = encodeURIComponent(identifier.trim());
-      const response = await fetch(`http://localhost:8000/sync/${encodedIdentifier}`);
+
+      const fetchWithTimeout = async (url, options = {}, timeout = 3000) => {
+        const controller = new AbortController();
+        const id = setTimeout(() => controller.abort(), timeout);
+        try {
+          const res = await fetch(url, { ...options, signal: controller.signal });
+          clearTimeout(id);
+          return res;
+        } catch (error) {
+          clearTimeout(id);
+          throw error;
+        }
+      };
+
+      let response;
+      try {
+        response = await fetchWithTimeout(`http://127.0.0.1:8000/sync/${encodedIdentifier}`);
+      } catch (e) {
+        try {
+          console.warn('Port 8000 failed, trying 8001...');
+          response = await fetchWithTimeout(`http://127.0.0.1:8001/sync/${encodedIdentifier}`);
+        } catch (e2) {
+          console.warn('Port 8001 failed, trying 8002...');
+          response = await fetchWithTimeout(`http://127.0.0.1:8002/sync/${encodedIdentifier}`);
+        }
+      }
 
       if (!response.ok) {
         throw new Error('Product not found. Check the ID or Link.');
@@ -36,10 +61,10 @@ export default function SyncStation({ onProductSynced }) {
   };
 
   return (
-    <div className="glass sync-station animate-fade" style={{ 
-      background: 'linear-gradient(135deg, var(--primary), #1E293B)', 
-      color: 'white', 
-      padding: '2.5rem', 
+    <div className="glass sync-station animate-fade" style={{
+      background: 'linear-gradient(135deg, var(--primary), #1E293B)',
+      color: 'white',
+      padding: '2.5rem',
       borderRadius: 'var(--radius-xl)',
       border: '1px solid rgba(255,255,255,0.1)',
       position: 'relative',
@@ -56,12 +81,12 @@ export default function SyncStation({ onProductSynced }) {
         borderRadius: '50%',
         pointerEvents: 'none'
       }}></div>
-      
+
       <div style={{ position: 'relative', zIndex: 1 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-          <div style={{ 
-            background: 'rgba(59, 130, 246, 0.2)', 
-            padding: '0.5rem', 
+          <div style={{
+            background: 'rgba(59, 130, 246, 0.2)',
+            padding: '0.5rem',
             borderRadius: '50%',
             border: '1px solid rgba(59, 130, 246, 0.3)'
           }}>
@@ -69,7 +94,7 @@ export default function SyncStation({ onProductSynced }) {
           </div>
           <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 700 }}>WhatsApp Sync Station</h3>
         </div>
-        
+
         <p style={{ opacity: 0.8, fontSize: '0.95rem', marginBottom: '2rem', lineHeight: 1.5 }}>
           Found something you like? Paste the <strong>WhatsApp Product Link</strong> or <strong>Product ID</strong> below to instantly sync it to your cart.
         </p>
@@ -110,10 +135,10 @@ export default function SyncStation({ onProductSynced }) {
             type="submit"
             className="btn"
             disabled={loading || !identifier.trim()}
-            style={{ 
-              width: '100%', 
-              background: loading ? 'rgba(245, 158, 11, 0.7)' : '#F59E0B', 
-              color: 'var(--primary)', 
+            style={{
+              width: '100%',
+              background: loading ? 'rgba(245, 158, 11, 0.7)' : '#F59E0B',
+              color: 'var(--primary)',
               fontWeight: 700,
               padding: '1rem 2rem',
               fontSize: '1.05rem',
@@ -133,13 +158,13 @@ export default function SyncStation({ onProductSynced }) {
         </form>
 
         {success && (
-          <div className="animate-fade" style={{ 
-            marginTop: '1.5rem', 
-            color: '#10B981', 
-            background: 'rgba(16, 185, 129, 0.15)', 
-            padding: '1rem', 
-            borderRadius: 'var(--radius-md)', 
-            fontSize: '0.9rem', 
+          <div className="animate-fade" style={{
+            marginTop: '1.5rem',
+            color: '#10B981',
+            background: 'rgba(16, 185, 129, 0.15)',
+            padding: '1rem',
+            borderRadius: 'var(--radius-md)',
+            fontSize: '0.9rem',
             textAlign: 'center',
             border: '1px solid rgba(16, 185, 129, 0.3)'
           }}>
@@ -149,13 +174,13 @@ export default function SyncStation({ onProductSynced }) {
         )}
 
         {error && (
-          <div className="animate-fade" style={{ 
-            marginTop: '1.5rem', 
-            color: '#EF4444', 
-            background: 'rgba(239, 68, 68, 0.15)', 
-            padding: '1rem', 
-            borderRadius: 'var(--radius-md)', 
-            fontSize: '0.9rem', 
+          <div className="animate-fade" style={{
+            marginTop: '1.5rem',
+            color: '#EF4444',
+            background: 'rgba(239, 68, 68, 0.15)',
+            padding: '1rem',
+            borderRadius: 'var(--radius-md)',
+            fontSize: '0.9rem',
             textAlign: 'center',
             border: '1px solid rgba(239, 68, 68, 0.3)'
           }}>

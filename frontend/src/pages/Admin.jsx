@@ -11,22 +11,110 @@ export default function Admin() {
     totalCustomers: 0,
     totalProducts: 0
   });
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     fetchOrders();
+
+    // Check for mock success parameter (for local testing)
+    const urlParams = new URLSearchParams(window.location.search);
+    const mockId = urlParams.get('mock_success');
+    if (mockId) {
+      simulateWebhook(mockId);
+    }
   }, []);
 
-  const fetchOrders = async () => {
+  const simulateWebhook = async (orderId) => {
+    console.log('Simulating webhook for order:', orderId);
+
+    const sendWebhook = async (port) => {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3000);
+      try {
+        const response = await fetch(`http://127.0.0.1:${port}/webhook/paystack`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            event: 'charge.success',
+            data: { reference: orderId }
+          }),
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+        return response;
+      } catch (err) {
+        clearTimeout(timeoutId);
+        throw err;
+      }
+    };
+
     try {
-      const response = await fetch('http://localhost:8000/orders');
+      let response;
+      try {
+        response = await sendWebhook(8000);
+      } catch (e) {
+        try {
+          response = await sendWebhook(8001);
+        } catch (e2) {
+          response = await sendWebhook(8002);
+        }
+      }
+
+      // Refresh to show "Completed"
+      fetchOrders();
+    } catch (e) {
+      console.error('Webhook simulation failed', e);
+    }
+  };
+
+  const fetchWithTimeout = async (url, options = {}, timeout = 3000) => {
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), timeout);
+    try {
+      const response = await fetch(url, { ...options, signal: controller.signal });
+      clearTimeout(id);
+      return response;
+    } catch (error) {
+      clearTimeout(id);
+      throw error;
+    }
+  };
+
+  const fetchOrders = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      console.log('Fetching orders...');
+      // Try 8000 -> 8001 -> 8002
+      let response;
+      try {
+        response = await fetchWithTimeout('http://127.0.0.1:8000/orders');
+      } catch (e) {
+        try {
+          console.warn('Port 8000 failed, trying 8001...');
+          response = await fetchWithTimeout('http://127.0.0.1:8001/orders');
+        } catch (e2) {
+          console.warn('Port 8001 failed, trying 8002...');
+          response = await fetchWithTimeout('http://127.0.0.1:8002/orders');
+        }
+      }
+
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
       const data = await response.json();
+      console.log('Orders received:', data);
+
+      if (!Array.isArray(data)) {
+        throw new Error('Data received is not an array');
+      }
+
       setOrders(data);
-      
-      // Calculate stats
-      const totalRevenue = data.reduce((sum, order) => sum + order.total_amount, 0);
-      const uniqueCustomers = new Set(data.map(order => order.customer_email)).size;
-      const totalProducts = data.reduce((sum, order) => 
-        sum + order.items.reduce((itemSum, item) => itemSum + item.quantity, 0), 0
+
+      // Calculate stats safely
+      const totalRevenue = data.reduce((sum, order) => sum + (order.total_amount || 0), 0);
+      const uniqueCustomers = new Set(data.filter(o => o.customer_email).map(order => order.customer_email)).size;
+      const totalProducts = data.reduce((sum, order) =>
+        sum + (order.items || []).reduce((itemSum, item) => itemSum + (item.quantity || 0), 0), 0
       );
 
       setStats({
@@ -37,6 +125,7 @@ export default function Admin() {
       });
     } catch (error) {
       console.error('Failed to fetch orders:', error);
+      setError(error.message);
     } finally {
       setLoading(false);
     }
@@ -58,6 +147,18 @@ export default function Admin() {
         <div style={{ textAlign: 'center' }}>
           <div style={{ width: '40px', height: '40px', border: '3px solid var(--accent)', borderTop: '3px solid transparent', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 1rem' }}></div>
           Loading Orders...
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="error-state" style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
+        <div className="glass" style={{ textAlign: 'center', padding: '3rem', borderRadius: 'var(--radius-lg)', maxWidth: '500px' }}>
+          <h2 style={{ color: '#EF4444', marginBottom: '1rem' }}>Connection Error</h2>
+          <p style={{ marginBottom: '2rem', color: 'var(--text-muted)' }}>The admin dashboard couldn't connect to the backend server. Error: {error}</p>
+          <button onClick={fetchOrders} className="btn btn-primary">Retry Connection</button>
         </div>
       </div>
     );

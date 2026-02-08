@@ -10,17 +10,45 @@ export default function BusinessDetail({ onProductSynced }) {
   const [syncedResults, setSyncedResults] = useState([]);
 
   useEffect(() => {
-    fetch('http://localhost:8000/businesses')
-      .then(res => res.json())
-      .then(data => {
+    const fetchData = async () => {
+      try {
+        const fetchWithTimeout = async (url, options = {}, timeout = 3000) => {
+          const controller = new AbortController();
+          const id = setTimeout(() => controller.abort(), timeout);
+          try {
+            const res = await fetch(url, { ...options, signal: controller.signal });
+            clearTimeout(id);
+            return res;
+          } catch (error) {
+            clearTimeout(id);
+            throw error;
+          }
+        };
+
+        let response;
+        try {
+          response = await fetchWithTimeout('http://127.0.0.1:8000/businesses');
+        } catch (e) {
+          try {
+            console.warn('Port 8000 failed, trying 8001...');
+            response = await fetchWithTimeout('http://127.0.0.1:8001/businesses');
+          } catch (e2) {
+            console.warn('Port 8001 failed, trying 8002...');
+            response = await fetchWithTimeout('http://127.0.0.1:8002/businesses');
+          }
+        }
+
+        if (!response.ok) throw new Error('Network response was not ok');
+        const data = await response.json();
         const found = data.find(biz => biz.slug === slug);
         setBusiness(found);
-        setLoading(false);
-      })
-      .catch(err => {
+      } catch (err) {
         console.error("Failed to fetch business", err);
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+    fetchData();
   }, [slug]);
 
   const handleManualSync = (product) => {
@@ -40,7 +68,7 @@ export default function BusinessDetail({ onProductSynced }) {
       </div>
     </div>
   );
-  
+
   if (!business) return (
     <div className="error-container" style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
       <div>
@@ -53,7 +81,7 @@ export default function BusinessDetail({ onProductSynced }) {
   return (
     <div className="business-detail-page">
       {/* Enhanced Header */}
-      <header className="biz-header" style={{ 
+      <header className="biz-header" style={{
         backgroundImage: `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.6)), url(${business.hero_image})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
@@ -61,12 +89,12 @@ export default function BusinessDetail({ onProductSynced }) {
       }}>
         <div className="biz-header-overlay">
           <div className="app-container" style={{ width: '100%' }}>
-            <Link to="/businesses" style={{ 
-              color: 'white', 
-              textDecoration: 'none', 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: '0.5rem', 
+            <Link to="/businesses" style={{
+              color: 'white',
+              textDecoration: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
               marginBottom: '2rem',
               background: 'rgba(255,255,255,0.1)',
               padding: '0.5rem 1rem',
@@ -77,16 +105,16 @@ export default function BusinessDetail({ onProductSynced }) {
             }}>
               <ArrowLeft size={18} /> Back to Directory
             </Link>
-            
+
             <div className="biz-profile">
               <img src={business.logo} alt={business.name} className="biz-logo-lg" style={{
                 boxShadow: '0 20px 40px rgba(0,0,0,0.3)'
               }} />
               <div className="biz-info-text">
-                <div className="badge" style={{ 
-                  background: 'rgba(59, 130, 246, 0.2)', 
-                  color: '#60A5FA', 
-                  marginBottom: '1rem', 
+                <div className="badge" style={{
+                  background: 'rgba(59, 130, 246, 0.2)',
+                  color: '#60A5FA',
+                  marginBottom: '1rem',
                   display: 'inline-block',
                   border: '1px solid rgba(59, 130, 246, 0.3)'
                 }}>
@@ -95,10 +123,10 @@ export default function BusinessDetail({ onProductSynced }) {
                 <h1 style={{ fontSize: '3.5rem', marginBottom: '1rem', textShadow: '0 2px 10px rgba(0,0,0,0.5)' }}>
                   {business.name}
                 </h1>
-                <p style={{ 
-                  color: 'rgba(255,255,255,0.9)', 
-                  maxWidth: '600px', 
-                  margin: '0 0 2rem', 
+                <p style={{
+                  color: 'rgba(255,255,255,0.9)',
+                  maxWidth: '600px',
+                  margin: '0 0 2rem',
                   fontSize: '1.125rem',
                   lineHeight: 1.6,
                   textShadow: '0 1px 3px rgba(0,0,0,0.5)'
@@ -107,15 +135,15 @@ export default function BusinessDetail({ onProductSynced }) {
                 </p>
                 <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(255,255,255,0.1)', padding: '0.5rem 1rem', borderRadius: 'var(--radius-full)' }}>
-                    <Star size={18} fill="#F59E0B" color="#F59E0B" /> 
+                    <Star size={18} fill="#F59E0B" color="#F59E0B" />
                     <span>4.9 Rating</span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(255,255,255,0.1)', padding: '0.5rem 1rem', borderRadius: 'var(--radius-full)' }}>
-                    <MapPin size={18} /> 
+                    <MapPin size={18} />
                     <span>Lagos, NG</span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(16, 185, 129, 0.2)', padding: '0.5rem 1rem', borderRadius: 'var(--radius-full)', border: '1px solid rgba(16, 185, 129, 0.3)' }}>
-                    <Zap size={18} color="#10B981" /> 
+                    <Zap size={18} color="#10B981" />
                     <span style={{ color: '#10B981' }}>Sync Verified</span>
                   </div>
                 </div>
@@ -128,22 +156,22 @@ export default function BusinessDetail({ onProductSynced }) {
       <div className="app-container" style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '4rem', padding: '4rem 2rem' }}>
         <main>
           {/* Enhanced Step 1 */}
-          <section className="glass" style={{ 
-            padding: '3rem', 
-            borderRadius: 'var(--radius-xl)', 
-            marginBottom: '3rem', 
+          <section className="glass" style={{
+            padding: '3rem',
+            borderRadius: 'var(--radius-xl)',
+            marginBottom: '3rem',
             border: '2px solid var(--accent)',
             background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(147, 197, 253, 0.05))'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-              <div style={{ 
-                background: 'var(--accent)', 
-                color: 'white', 
-                width: '40px', 
-                height: '40px', 
-                borderRadius: '50%', 
-                display: 'flex', 
-                alignItems: 'center', 
+              <div style={{
+                background: 'var(--accent)',
+                color: 'white',
+                width: '40px',
+                height: '40px',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
                 justifyContent: 'center',
                 fontWeight: 'bold'
               }}>1</div>
@@ -152,8 +180,8 @@ export default function BusinessDetail({ onProductSynced }) {
             <p style={{ color: 'var(--text-muted)', marginBottom: '2rem', fontSize: '1.1rem', lineHeight: 1.6 }}>
               Visit our official WhatsApp Business catalog to see all available products with real-time pricing and availability. Find what you love and copy the product link.
             </p>
-            <a href={business.whatsapp_link} target="_blank" rel="noopener noreferrer" className="btn btn-primary btn-large" style={{ 
-              width: '100%', 
+            <a href={business.whatsapp_link} target="_blank" rel="noopener noreferrer" className="btn btn-primary btn-large" style={{
+              width: '100%',
               justifyContent: 'center',
               background: '#25D366',
               fontSize: '1.125rem',
@@ -166,14 +194,14 @@ export default function BusinessDetail({ onProductSynced }) {
           {/* Enhanced Step 2 */}
           <section id="sync-section" style={{ marginBottom: '3rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
-              <div style={{ 
-                background: '#F59E0B', 
-                color: 'white', 
-                width: '40px', 
-                height: '40px', 
-                borderRadius: '50%', 
-                display: 'flex', 
-                alignItems: 'center', 
+              <div style={{
+                background: '#F59E0B',
+                color: 'white',
+                width: '40px',
+                height: '40px',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
                 justifyContent: 'center',
                 fontWeight: 'bold'
               }}>2</div>
@@ -186,14 +214,14 @@ export default function BusinessDetail({ onProductSynced }) {
           {syncedResults.length > 0 && (
             <section className="animate-fade" style={{ marginBottom: '3rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
-                <div style={{ 
-                  background: '#10B981', 
-                  color: 'white', 
-                  width: '40px', 
-                  height: '40px', 
-                  borderRadius: '50%', 
-                  display: 'flex', 
-                  alignItems: 'center', 
+                <div style={{
+                  background: '#10B981',
+                  color: 'white',
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
                   justifyContent: 'center',
                   fontWeight: 'bold'
                 }}>3</div>
@@ -201,7 +229,7 @@ export default function BusinessDetail({ onProductSynced }) {
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '2rem' }}>
                 {syncedResults.map((product, idx) => (
-                  <div key={`${product.code}-${idx}`} className="prod-card glass" style={{ 
+                  <div key={`${product.code}-${idx}`} className="prod-card glass" style={{
                     border: '2px solid #10B981',
                     background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.05), rgba(52, 211, 153, 0.05))'
                   }}>
@@ -212,8 +240,8 @@ export default function BusinessDetail({ onProductSynced }) {
                       <h3 style={{ fontSize: '1.25rem', marginBottom: '0.5rem' }}>{product.name}</h3>
                       <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>{product.description}</p>
                       <div className="prod-price" style={{ margin: '1rem 0', fontSize: '1.5rem' }}>₦{product.price.toLocaleString()}</div>
-                      <button onClick={() => handleAddToCart(product)} className="btn btn-primary" style={{ 
-                        width: '100%', 
+                      <button onClick={() => handleAddToCart(product)} className="btn btn-primary" style={{
+                        width: '100%',
                         background: '#10B981',
                         fontSize: '1rem',
                         padding: '0.75rem'

@@ -10,9 +10,37 @@ export default function Landing({ onProductSynced }) {
   const [syncedResults, setSyncedResults] = useState([]);
 
   useEffect(() => {
-    fetch('http://localhost:8000/businesses')
-      .then(res => res.json())
-      .then(data => {
+    const fetchData = async () => {
+      try {
+        const fetchWithTimeout = async (url, options = {}, timeout = 3000) => {
+          const controller = new AbortController();
+          const id = setTimeout(() => controller.abort(), timeout);
+          try {
+            const res = await fetch(url, { ...options, signal: controller.signal });
+            clearTimeout(id);
+            return res;
+          } catch (error) {
+            clearTimeout(id);
+            throw error;
+          }
+        };
+
+        let response;
+        try {
+          response = await fetchWithTimeout('http://127.0.0.1:8000/businesses');
+        } catch (e) {
+          try {
+            console.warn('Port 8000 failed, trying 8001...');
+            response = await fetchWithTimeout('http://127.0.0.1:8001/businesses');
+          } catch (e2) {
+            console.warn('Port 8001 failed, trying 8002...');
+            response = await fetchWithTimeout('http://127.0.0.1:8002/businesses');
+          }
+        }
+
+        if (!response.ok) throw new Error('Network response was not ok');
+        const data = await response.json();
+
         const products = [];
         const businesses = data.filter(b => b.featured);
 
@@ -26,12 +54,13 @@ export default function Landing({ onProductSynced }) {
 
         setFeaturedProducts(products.slice(0, 4));
         setFeaturedBusinesses(businesses.slice(0, 3));
-        setLoading(false);
-      })
-      .catch(err => {
+      } catch (err) {
         console.error("Failed to fetch data for landing", err);
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+    fetchData();
   }, []);
 
   const handleManualSync = (product) => {
