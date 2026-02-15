@@ -3,3 +3,9 @@ uvicorn
 pydantic
 requests
 python-dotenv
+motor
+dnspython
+python-multipart
+passlib[bcrypt]
+python-jose[cryptography]
+email-validator

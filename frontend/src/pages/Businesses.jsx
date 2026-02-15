@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, MapPin, Star, ArrowLeft } from 'lucide-react';
+import { API_URL } from '../config';
 
 export default function Businesses() {
   const [businesses, setBusinesses] = useState([]);
@@ -23,19 +24,7 @@ export default function Businesses() {
           }
         };
 
-        let response;
-        try {
-          response = await fetchWithTimeout('http://127.0.0.1:8000/businesses');
-        } catch (e) {
-          try {
-            console.warn('Port 8000 failed, trying 8001...');
-            response = await fetchWithTimeout('http://127.0.0.1:8001/businesses');
-          } catch (e2) {
-            console.warn('Port 8001 failed, trying 8002...');
-            response = await fetchWithTimeout('http://127.0.0.1:8002/businesses');
-          }
-        }
-
+        const response = await fetchWithTimeout(`${API_URL}/businesses`);
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
         setBusinesses(data);

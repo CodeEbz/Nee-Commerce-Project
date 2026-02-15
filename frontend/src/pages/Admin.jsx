@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowLeft, Package, Users, TrendingUp, Calendar, Eye } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { ArrowLeft, Package, Users, TrendingUp, Calendar, Eye, LogOut } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { API_URL } from '../config';
 
 export default function Admin() {
   const [orders, setOrders] = useState([]);
@@ -12,6 +14,8 @@ export default function Admin() {
     totalProducts: 0
   });
   const [error, setError] = useState(null);
+  const { token, logout, user } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchOrders();
@@ -27,13 +31,16 @@ export default function Admin() {
   const simulateWebhook = async (orderId) => {
     console.log('Simulating webhook for order:', orderId);
 
-    const sendWebhook = async (port) => {
+    const sendWebhook = async () => {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 3000);
       try {
-        const response = await fetch(`http://127.0.0.1:${port}/webhook/paystack`, {
+        const response = await fetch(`${API_URL}/webhook/paystack`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
           body: JSON.stringify({
             event: 'charge.success',
             data: { reference: orderId }
@@ -49,16 +56,7 @@ export default function Admin() {
     };
 
     try {
-      let response;
-      try {
-        response = await sendWebhook(8000);
-      } catch (e) {
-        try {
-          response = await sendWebhook(8001);
-        } catch (e2) {
-          response = await sendWebhook(8002);
-        }
-      }
+      await sendWebhook();
 
       // Refresh to show "Completed"
       fetchOrders();
@@ -85,19 +83,8 @@ export default function Admin() {
     setError(null);
     try {
       console.log('Fetching orders...');
-      // Try 8000 -> 8001 -> 8002
-      let response;
-      try {
-        response = await fetchWithTimeout('http://127.0.0.1:8000/orders');
-      } catch (e) {
-        try {
-          console.warn('Port 8000 failed, trying 8001...');
-          response = await fetchWithTimeout('http://127.0.0.1:8001/orders');
-        } catch (e2) {
-          console.warn('Port 8001 failed, trying 8002...');
-          response = await fetchWithTimeout('http://127.0.0.1:8002/orders');
-        }
-      }
+      const headers = { 'Authorization': `Bearer ${token}` };
+      const response = await fetchWithTimeout(`${API_URL}/orders`, { headers });
 
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
@@ -157,8 +144,17 @@ export default function Admin() {
       <div className="error-state" style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
         <div className="glass" style={{ textAlign: 'center', padding: '3rem', borderRadius: 'var(--radius-lg)', maxWidth: '500px' }}>
           <h2 style={{ color: '#EF4444', marginBottom: '1rem' }}>Connection Error</h2>
-          <p style={{ marginBottom: '2rem', color: 'var(--text-muted)' }}>The admin dashboard couldn't connect to the backend server. Error: {error}</p>
-          <button onClick={fetchOrders} className="btn btn-primary">Retry Connection</button>
+          <p style={{ marginBottom: '1rem', color: 'var(--text-muted)' }}>The admin dashboard couldn't connect to the backend server.</p>
+          <div style={{ background: '#FEF2F2', padding: '1rem', borderRadius: 'var(--radius-md)', marginBottom: '2rem', fontSize: '0.875rem', color: '#B91C1C', textAlign: 'left' }}>
+            <strong>Possible reasons:</strong>
+            <ul style={{ margin: '0.5rem 0 0', paddingLeft: '1.25rem' }}>
+              <li>The backend server is not running.</li>
+              <li>The server is running on a different port.</li>
+              <li>A firewall is blocking the connection.</li>
+            </ul>
+          </div>
+          <button onClick={() => { setError(null); fetchOrders(); }} className="btn btn-primary" style={{ width: '100%' }}>Retry Connection</button>
+          <p style={{ marginTop: '1rem', fontSize: '0.75rem', color: 'var(--text-muted)' }}>Technical error: {error}</p>
         </div>
       </div>
     );
@@ -172,8 +168,18 @@ export default function Admin() {
           <Link to="/" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
             <ArrowLeft size={20} /> Back to Store
           </Link>
-          <h1 style={{ fontSize: '2.5rem', margin: 0 }}>Admin Dashboard</h1>
-          <p style={{ opacity: 0.8, margin: '0.5rem 0 0' }}>Monitor your sales and orders</p>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <h1 style={{ fontSize: '2.5rem', margin: 0 }}>Admin Dashboard</h1>
+              <p style={{ opacity: 0.8, margin: '0.5rem 0 0' }}>Monitor your sales and orders</p>
+            </div>
+            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+              <span style={{ fontSize: '0.875rem', opacity: 0.8 }}>Logged in as <strong>{user?.full_name}</strong></span>
+              <button onClick={() => { logout(); navigate('/login'); }} className="btn btn-outline" style={{ color: 'white', borderColor: 'rgba(255,255,255,0.3)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <LogOut size={18} /> Logout
+              </button>
+            </div>
+          </div>
         </div>
       </header>
 

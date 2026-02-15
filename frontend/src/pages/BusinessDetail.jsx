@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, ExternalLink, Package, ShoppingBag, Info, Zap, Plus, Star, MapPin, Clock } from 'lucide-react';
 import SyncStation from '../components/SyncStation';
+import { API_URL } from '../config';
 
 export default function BusinessDetail({ onProductSynced }) {
   const { slug } = useParams();
@@ -25,19 +26,7 @@ export default function BusinessDetail({ onProductSynced }) {
           }
         };
 
-        let response;
-        try {
-          response = await fetchWithTimeout('http://127.0.0.1:8000/businesses');
-        } catch (e) {
-          try {
-            console.warn('Port 8000 failed, trying 8001...');
-            response = await fetchWithTimeout('http://127.0.0.1:8001/businesses');
-          } catch (e2) {
-            console.warn('Port 8001 failed, trying 8002...');
-            response = await fetchWithTimeout('http://127.0.0.1:8002/businesses');
-          }
-        }
-
+        const response = await fetchWithTimeout(`${API_URL}/businesses`);
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
         const found = data.find(biz => biz.slug === slug);

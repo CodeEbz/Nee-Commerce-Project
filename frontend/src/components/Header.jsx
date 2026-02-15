@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom'
-import { ShoppingBag, ChevronRight, Menu, X } from 'lucide-react'
+import { ShoppingBag, ChevronRight, Menu, X, User as UserIcon, LogOut } from 'lucide-react'
 import { useState, useEffect } from 'react'
+import { useAuth } from '../context/AuthContext'
 
 const Logo = ({ size = 40 }) => (
   <div style={{
@@ -24,6 +25,7 @@ const Logo = ({ size = 40 }) => (
 const Header = ({ cart, onShowCheckout, totalAmount }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { user, logout } = useAuth();
   const location = useLocation();
 
   useEffect(() => {
@@ -49,11 +51,33 @@ const Header = ({ cart, onShowCheckout, totalAmount }) => {
         <nav className="desktop-nav">
           <Link to="/" className={`nav-link ${location.pathname === '/' ? 'active' : ''}`}>Home</Link>
           <Link to="/businesses" className={`nav-link ${location.pathname === '/businesses' ? 'active' : ''}`}>Explore</Link>
-          <Link to="/admin" className={`nav-link ${location.pathname === '/admin' ? 'active' : ''}`}>Admin</Link>
+          {user ? (
+            <Link to="/merchant" className={`nav-link ${location.pathname === '/merchant' ? 'active' : ''}`}>Dashboard</Link>
+          ) : (
+            <Link to="/login" className={`nav-link ${location.pathname === '/login' ? 'active' : ''}`}>Merchant Login</Link>
+          )}
         </nav>
 
         {/* Header Actions */}
         <div className="header-actions">
+          {/* User Section (Desktop) */}
+          {user && (
+            <div className="user-nav-item desktop-only" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginRight: '1rem' }}>
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-main)' }}>{user.nickname || user.full_name.split(' ')[0]}</div>
+                <button
+                  onClick={logout}
+                  style={{ background: 'none', border: 'none', padding: 0, fontSize: '0.75rem', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.25rem' }}
+                >
+                  <LogOut size={12} /> Logout
+                </button>
+              </div>
+              <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700 }}>
+                {user.full_name[0]}
+              </div>
+            </div>
+          )}
+
           {/* Cart Badge */}
           <div className="cart-badge-trigger" onClick={onShowCheckout}>
             <div className="cart-icon-wrapper">
@@ -79,7 +103,14 @@ const Header = ({ cart, onShowCheckout, totalAmount }) => {
           <nav className="mobile-nav">
             <Link to="/" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>Home <ChevronRight size={16} /></Link>
             <Link to="/businesses" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>Explore <ChevronRight size={16} /></Link>
-            <Link to="/admin" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>Admin <ChevronRight size={16} /></Link>
+            {user ? (
+              <>
+                <Link to="/merchant" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>Merchant Dashboard <ChevronRight size={16} /></Link>
+                <div className="mobile-nav-link" onClick={() => { logout(); setMobileMenuOpen(false); }} style={{ color: '#EF4444' }}>Logout <LogOut size={16} /></div>
+              </>
+            ) : (
+              <Link to="/login" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>Merchant Login <ChevronRight size={16} /></Link>
+            )}
           </nav>
         </div>
       )}

@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ExternalLink, ShoppingBag } from 'lucide-react';
+import { API_URL } from '../config';
 
 export default function BusinessList() {
   const [businesses, setBusinesses] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('http://localhost:8000/businesses')
+    fetch(`${API_URL}/businesses`)
       .then(res => res.json())
       .then(data => {
         setBusinesses(data);

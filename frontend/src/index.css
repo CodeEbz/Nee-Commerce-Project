@@ -593,6 +593,16 @@ h6 {
   width: 100%;
 }
 
+.desktop-only {
+  display: flex !important;
+}
+
+@media (max-width: 768px) {
+  .desktop-only {
+    display: none !important;
+  }
+}
+
 .header-actions {
   display: flex;
   align-items: center;

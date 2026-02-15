@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Zap, Link as LinkIcon, CheckCircle2, AlertCircle, Loader2, Smartphone } from 'lucide-react';
+import { API_URL } from '../config';
 
 export default function SyncStation({ onProductSynced }) {
   const [identifier, setIdentifier] = useState('');
@@ -31,18 +32,7 @@ export default function SyncStation({ onProductSynced }) {
         }
       };
 
-      let response;
-      try {
-        response = await fetchWithTimeout(`http://127.0.0.1:8000/sync/${encodedIdentifier}`);
-      } catch (e) {
-        try {
-          console.warn('Port 8000 failed, trying 8001...');
-          response = await fetchWithTimeout(`http://127.0.0.1:8001/sync/${encodedIdentifier}`);
-        } catch (e2) {
-          console.warn('Port 8001 failed, trying 8002...');
-          response = await fetchWithTimeout(`http://127.0.0.1:8002/sync/${encodedIdentifier}`);
-        }
-      }
+      const response = await fetchWithTimeout(`${API_URL}/sync/${encodedIdentifier}`);
 
       if (!response.ok) {
         throw new Error('Product not found. Check the ID or Link.');

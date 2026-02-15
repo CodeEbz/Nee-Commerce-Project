@@ -7,6 +7,13 @@ import Businesses from './pages/Businesses'
 import BusinessDetail from './pages/BusinessDetail'
 import Admin from './pages/Admin'
 import Header from './components/Header'
+import HowItWorks from './pages/HowItWorks'
+import MerchantDashboard from './pages/MerchantDashboard'
+import Login from './pages/Login'
+import Signup from './pages/Signup'
+import { AuthProvider } from './context/AuthContext'
+import ProtectedRoute from './components/ProtectedRoute'
+import { API_URL } from './config'
 
 function App() {
   const [cart, setCart] = useState([]);
@@ -78,10 +85,10 @@ function App() {
       };
 
       try {
-        response = await fetchWithTimeout('http://127.0.0.1:8000/payments/initialize', checkoutOptions);
+        response = await fetchWithTimeout(`${API_URL}/payments/initialize`, checkoutOptions);
       } catch (e) {
         console.error('Connection to backend failed:', e);
-        throw new Error('Could not connect to the server. Please ensure the backend is running.');
+        throw new Error(`Could not connect to the server at ${API_URL}. Please ensure the backend is running.`);
       }
 
       if (response.ok) {
@@ -110,37 +117,54 @@ function App() {
 
   return (
     <Router>
-      <div className="app-container">
-        <Header
-          cart={cart}
-          onShowCheckout={() => setShowCheckout(true)}
-          totalAmount={getTotalAmount()}
-        />
-
-        {/* Checkout Modal */}
-
-        {/* Checkout Modal */}
-        {showCheckout && (
-          <CheckoutModal
+      <AuthProvider>
+        <div className="app-container">
+          <Header
             cart={cart}
-            onClose={() => setShowCheckout(false)}
-            onCheckout={handleCheckout}
-            onUpdateQuantity={updateQuantity}
-            onRemoveItem={removeFromCart}
-            loading={checkoutLoading}
-            total={getTotalAmount()}
+            onShowCheckout={() => setShowCheckout(true)}
+            totalAmount={getTotalAmount()}
           />
-        )}
 
-        <Routes>
-          <Route path="/" element={<Landing cart={cart} onProductSynced={addToCart} />} />
-          <Route path="/businesses" element={<Businesses />} />
-          <Route path="/business/:slug" element={<BusinessDetail onProductSynced={addToCart} />} />
-          <Route path="/admin" element={<Admin />} />
-        </Routes>
-      </div>
+          {showCheckout && (
+            <CheckoutModal
+              cart={cart}
+              onClose={() => setShowCheckout(false)}
+              onCheckout={handleCheckout}
+              onUpdateQuantity={updateQuantity}
+              onRemoveItem={removeFromCart}
+              loading={checkoutLoading}
+              total={getTotalAmount()}
+            />
+          )}
+
+          <Routes>
+            <Route path="/" element={<Landing cart={cart} onProductSynced={addToCart} />} />
+            <Route path="/businesses" element={<Businesses />} />
+            <Route path="/how-it-works" element={<HowItWorks />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route
+              path="/merchant"
+              element={
+                <ProtectedRoute>
+                  <MerchantDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/business/:slug" element={<BusinessDetail onProductSynced={addToCart} />} />
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute adminOnly={true}>
+                  <Admin />
+                </ProtectedRoute>
+              }
+            />
+          </Routes>
+        </div>
+      </AuthProvider>
     </Router>
-  )
+  );
 }
 
 // Checkout Modal Component

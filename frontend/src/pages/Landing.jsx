@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, ShoppingBag, Zap, Star, TrendingUp, Dumbbell, Sparkles } from 'lucide-react';
 import SyncStation from '../components/SyncStation';
+import { API_URL } from '../config';
 
 export default function Landing({ onProductSynced }) {
   const [featuredProducts, setFeaturedProducts] = useState([]);
@@ -25,19 +26,7 @@ export default function Landing({ onProductSynced }) {
           }
         };
 
-        let response;
-        try {
-          response = await fetchWithTimeout('http://127.0.0.1:8000/businesses');
-        } catch (e) {
-          try {
-            console.warn('Port 8000 failed, trying 8001...');
-            response = await fetchWithTimeout('http://127.0.0.1:8001/businesses');
-          } catch (e2) {
-            console.warn('Port 8001 failed, trying 8002...');
-            response = await fetchWithTimeout('http://127.0.0.1:8002/businesses');
-          }
-        }
-
+        const response = await fetchWithTimeout(`${API_URL}/businesses`);
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
 
@@ -91,7 +80,7 @@ export default function Landing({ onProductSynced }) {
             <Link to="/businesses" className="btn btn-primary btn-large">
               Explore Shops <ArrowRight size={20} />
             </Link>
-            <Link to="/businesses" className="btn btn-outline btn-large">
+            <Link to="/how-it-works" className="btn btn-outline btn-large">
               How it Works
             </Link>
           </div>
@@ -239,6 +228,7 @@ export default function Landing({ onProductSynced }) {
           <p style={{ opacity: 0.8, marginBottom: '2rem' }}>Bridging WhatsApp Business with seamless e-commerce</p>
           <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', flexWrap: 'wrap' }}>
             <Link to="/businesses" style={{ color: 'rgba(255,255,255,0.8)', textDecoration: 'none' }}>Browse Stores</Link>
+            <Link to="/merchant" style={{ color: 'rgba(255,255,255,0.8)', textDecoration: 'none' }}>Merchant Dashboard</Link>
             <Link to="/admin" style={{ color: 'rgba(255,255,255,0.8)', textDecoration: 'none' }}>Admin Dashboard</Link>
           </div>
           <div style={{ marginTop: '2rem', paddingTop: '2rem', borderTop: '1px solid rgba(255,255,255,0.2)', opacity: 0.6 }}>
