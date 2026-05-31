@@ -57,6 +57,22 @@ app.add_middleware(
 # Paystack Config
 PAYSTACK_SECRET_KEY = os.getenv("PAYSTACK_SECRET_KEY", "sk_test_placeholder")
 PAYSTACK_API_URL = "https://api.paystack.co"
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
+
+def sanitize_mongo_obj(obj):
+    if not obj:
+        return obj
+    if isinstance(obj, list):
+        return [sanitize_mongo_obj(i) for i in obj]
+    if isinstance(obj, dict):
+        new_obj = obj.copy()
+        if "_id" in new_obj:
+            new_obj["id"] = str(new_obj["_id"])
+            del new_obj["_id"]
+        for key, value in new_obj.items():
+            new_obj[key] = sanitize_mongo_obj(value)
+        return new_obj
+    return obj
 
 # Pydantic Models for API
 class CartItem(BaseModel):
@@ -94,17 +110,30 @@ class BusinessUpdate(BaseModel):
     hero_image: Optional[str] = None
     whatsapp_link: Optional[str] = None
 
+class BusinessCreate(BaseModel):
+    name: str
+    category: str
+    description: Optional[str] = None
+
 class UserSignup(BaseModel):
     email: str
     nickname: Optional[str] = None
     password: str
     full_name: str
+    is_merchant: bool = False
+
+class UserUpdate(BaseModel):
+    full_name: Optional[str] = None
+    nickname: Optional[str] = None
+    profile_picture: Optional[str] = None
 
 class UserResponse(BaseModel):
     email: str
     nickname: Optional[str] = None
     full_name: str
     is_admin: bool
+    is_merchant: bool = False
+    profile_picture: Optional[str] = None
 
 class Token(BaseModel):
     access_token: str
@@ -125,7 +154,8 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         raise credentials_exception
     
     db = get_database()
-    user = await db.users.find_one({"email": email})
+    # Normalize email to lowercase for lookup
+    user = await db.users.find_one({"email": email.lower()})
     if user is None:
         raise credentials_exception
     return user
@@ -151,11 +181,60 @@ async def ping():
 async def get_businesses():
     """Returns the list of all businesses and their catalogs from MongoDB."""
     db = get_database()
+    businesses = await db.businesses.find({"is_approved": {"$ne": False}}).to_list(length=100)
+    return sanitize_mongo_obj(businesses)
+
+@app.get("/my-businesses")
+async def get_my_businesses(current_user: dict = Depends(get_current_user)):
+    """Returns businesses owned by the current user."""
+    db = get_database()
+    businesses = await db.businesses.find({"owner_email": current_user["email"]}).to_list(length=100)
+    return sanitize_mongo_obj(businesses)
+
+@app.get("/admin/users")
+async def admin_get_users(current_admin: dict = Depends(get_current_admin)):
+    """Returns all registered users (Admin only)."""
+    db = get_database()
+    users = await db.users.find().to_list(length=100)
+    return sanitize_mongo_obj(users)
+
+@app.get("/admin/businesses")
+async def admin_get_businesses(current_admin: dict = Depends(get_current_admin)):
+    """Returns all businesses with owner info (Admin only)."""
+    db = get_database()
     businesses = await db.businesses.find().to_list(length=100)
-    # Format for frontend compatibility
-    for biz in businesses:
-        biz["id"] = biz.get("_id")
-    return businesses
+    return sanitize_mongo_obj(businesses)
+
+@app.put("/admin/businesses/{business_id}/approve")
+async def approve_business(business_id: str, current_admin: dict = Depends(get_current_admin)):
+    db = get_database()
+    result = await db.businesses.update_one({"_id": business_id}, {"$set": {"is_approved": True}})
+    if result.modified_count == 0:
+        # Also check if it exists at all
+        existing = await db.businesses.find_one({"_id": business_id})
+        if not existing:
+            raise HTTPException(status_code=404, detail="Business not found")
+    return {"status": "success"}
+
+@app.get("/merchant/orders")
+async def get_merchant_orders(current_user: dict = Depends(get_current_user)):
+    """Returns orders that contain products from businesses owned by the merchant."""
+    db = get_database()
+    # Find businesses owned by the user
+    my_businesses = await db.businesses.find({"owner_email": current_user["email"]}).to_list(length=100)
+    my_business_names = [b["name"] for b in my_businesses]
+    
+    # Simple strategy: find orders where at least one item matches my business name
+    # In a more robust system, we'd use business IDs
+    orders = await db.orders.find({"items.business_name": {"$in": my_business_names}}).to_list(length=100)
+    
+    # Filter items in each order to only show what belongs to this merchant (optional but helpful)
+    for order in orders:
+        order["id"] = order.get("_id")
+        # Keep all order info but maybe the merchant only cares about their share? 
+        # For now return full order for context.
+        
+    return sanitize_mongo_obj(orders)
 
 # AUTH ENDPOINTS
 @app.post("/auth/signup", response_model=UserResponse)
@@ -166,24 +245,27 @@ async def signup(user_data: UserSignup):
         raise HTTPException(status_code=400, detail="Email already registered")
         
     hashed_pwd = auth_utils.get_password_hash(user_data.password)
+    user_email = user_data.email.lower().strip()
     new_user = {
-        "email": user_data.email,
+        "email": user_email,
         "nickname": user_data.nickname,
         "hashed_password": hashed_pwd,
         "full_name": user_data.full_name,
-        "is_admin": False,
+        "is_admin": user_email == "ebzchin@gmail.com",
+        "is_merchant": user_data.is_merchant,
         "created_at": datetime.utcnow()
     }
     await db.users.insert_one(new_user)
-    return new_user
+    return sanitize_mongo_obj(new_user)
 
 @app.post("/token", response_model=Token)
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     db = get_database()
-    print(f"Login attempt for: {form_data.username}")
-    user = await db.users.find_one({"email": form_data.username})
+    user_email = form_data.username.lower().strip()
+    print(f"DEBUG: Login attempt for: {user_email}")
+    user = await db.users.find_one({"email": user_email})
     if not user:
-        print(f"User not found: {form_data.username}")
+        print(f"DEBUG: User not found: {user_email}")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password",
@@ -204,7 +286,23 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
 
 @app.get("/auth/me", response_model=UserResponse)
 async def get_me(current_user: dict = Depends(get_current_user)):
-    return current_user
+    return sanitize_mongo_obj(current_user)
+
+@app.put("/auth/me", response_model=UserResponse)
+async def update_me(user_data: UserUpdate, current_user: dict = Depends(get_current_user)):
+    db = get_database()
+    update_data = {k: v for k, v in user_data.dict().items() if v is not None}
+    
+    if not update_data:
+        return sanitize_mongo_obj(current_user)
+        
+    await db.users.update_one(
+        {"_id": current_user["_id"]},
+        {"$set": update_data}
+    )
+    
+    updated_user = await db.users.find_one({"_id": current_user["_id"]})
+    return sanitize_mongo_obj(updated_user)
 
 @app.get("/sync/{identifier:path}")
 async def sync_product(identifier: str):
@@ -244,7 +342,7 @@ async def sync_product(identifier: str):
     raise HTTPException(status_code=404, detail="Product not found.")
 
 @app.post("/payments/initialize")
-async def initialize_payment(checkout_data: CheckoutRequest):
+async def initialize_payment(request: Request, checkout_data: CheckoutRequest):
     db = get_database()
     try:
         order_id = f"ORD-{int(time.time())}"
@@ -265,7 +363,7 @@ async def initialize_payment(checkout_data: CheckoutRequest):
         if PAYSTACK_SECRET_KEY == "sk_test_placeholder":
             return {
                 "status": "success",
-                "authorization_url": f"http://localhost:5173/admin?mock_success={order_id}",
+                "authorization_url": f"{FRONTEND_URL}/admin?mock_success={order_id}",
                 "reference": order_id,
                 "order_id": order_id,
                 "demo_mode": True
@@ -279,7 +377,7 @@ async def initialize_payment(checkout_data: CheckoutRequest):
             "email": checkout_data.customer_email,
             "amount": int(checkout_data.total_amount * 100),
             "reference": order_id,
-            "callback_url": "http://localhost:5173/admin" 
+            "callback_url": f"{FRONTEND_URL}/admin" 
         }
 
         response = requests.post(f"{PAYSTACK_API_URL}/transaction/initialize", json=paystack_payload, headers=headers)
@@ -318,41 +416,174 @@ async def get_orders(current_admin: dict = Depends(get_current_admin)):
         order["id"] = order.get("_id")
     return orders
 
+from collections import defaultdict
+
+@app.get("/admin/analytics")
+async def get_admin_analytics(current_admin: dict = Depends(get_current_admin)):
+    db = get_database()
+    orders = await db.orders.find().to_list(length=1000)
+    
+    daily_revenue_map = defaultdict(float)
+    product_sales = defaultdict(int)
+    business_sales = defaultdict(float)
+    
+    for order in orders:
+        # We can analyze all orders or just completed ones. Let's stick to completed for revenue.
+        if order.get("status") not in ["completed", "pending"]: # Include pending for demo purposes
+            continue
+            
+        date_str = order.get("created_at", datetime.utcnow()).strftime("%m/%d")
+        daily_revenue_map[date_str] += order.get("total_amount", 0)
+        
+        for item in order.get("items", []):
+            prod_name = item.get("name")
+            biz_name = item.get("business_name")
+            qty = item.get("quantity", 1)
+            
+            product_sales[prod_name] += qty
+            business_sales[biz_name] += (item.get("price", 0) * qty)
+            
+    daily_revenue = [{"date": k, "revenue": v} for k, v in sorted(daily_revenue_map.items())[-30:]]
+    top_products = [{"name": k, "sales": v} for k, v in sorted(product_sales.items(), key=lambda x: x[1], reverse=True)[:5]]
+    top_businesses = [{"name": k, "revenue": v} for k, v in sorted(business_sales.items(), key=lambda x: x[1], reverse=True)[:5]]
+    
+    return {
+        "dailyRevenue": daily_revenue,
+        "topProducts": top_products,
+        "topBusinesses": top_businesses
+    }
+
+@app.get("/merchant/analytics")
+async def get_merchant_analytics(current_user: dict = Depends(get_current_user)):
+    db = get_database()
+    my_businesses = await db.businesses.find({"owner_email": current_user["email"]}).to_list(length=100)
+    my_business_names = [b["name"] for b in my_businesses]
+    my_business_slugs = [b["slug"] for b in my_businesses]
+    
+    orders = await db.orders.find({"$or": [{"items.business_name": {"$in": my_business_names}}, {"items.business_slug": {"$in": my_business_slugs}}]}).to_list(length=1000)
+    
+    daily_revenue_map = defaultdict(float)
+    product_sales = defaultdict(int)
+    total_revenue = 0
+    total_orders = 0
+    
+    for order in orders:
+        if order.get("status") not in ["completed", "pending"]:
+            continue
+            
+        merchant_share = 0
+        has_merchant_item = False
+        
+        for item in order.get("items", []):
+            if item.get("business_name") in my_business_names or item.get("business_slug") in my_business_slugs:
+                qty = item.get("quantity", 1)
+                revenue = item.get("price", 0) * qty
+                merchant_share += revenue
+                has_merchant_item = True
+                
+                prod_name = item.get("name")
+                product_sales[prod_name] += qty
+                
+        if has_merchant_item:
+            total_orders += 1
+            total_revenue += merchant_share
+            date_str = order.get("created_at", datetime.utcnow()).strftime("%m/%d")
+            daily_revenue_map[date_str] += merchant_share
+            
+    daily_revenue = [{"date": k, "revenue": v} for k, v in sorted(daily_revenue_map.items())[-30:]]
+    top_products = [{"name": k, "sales": v} for k, v in sorted(product_sales.items(), key=lambda x: x[1], reverse=True)[:5]]
+    
+    return {
+        "totalRevenue": total_revenue,
+        "totalOrders": total_orders,
+        "dailyRevenue": daily_revenue,
+        "topProducts": top_products
+    }
+
 @app.post("/upload")
-async def upload_file(file: UploadFile = File(...), current_user: dict = Depends(get_current_user)):
+async def upload_file(request: Request, file: UploadFile = File(...), current_user: dict = Depends(get_current_user)):
     try:
         file_extension = os.path.splitext(file.filename)[1]
         unique_filename = f"{uuid.uuid4()}{file_extension}"
         file_path = os.path.join(UPLOAD_DIR, unique_filename)
         with open(file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
-        return {"url": f"http://localhost:8000/uploads/{unique_filename}"}
+        base_url = str(request.base_url).rstrip("/")
+        return {"url": f"{base_url}/uploads/{unique_filename}"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.put("/businesses/{business_id}")
 async def update_business(business_id: str, business_update: BusinessUpdate, current_user: dict = Depends(get_current_user)):
     db = get_database()
+    
+    # Check ownership unless admin
+    existing = await db.businesses.find_one({"_id": business_id})
+    if not existing:
+        raise HTTPException(status_code=404, detail="Business not found")
+        
+    if not current_user.get("is_admin") and existing.get("owner_email") != current_user["email"]:
+        raise HTTPException(status_code=403, detail="Not authorized to update this business")
+        
     update_data = business_update.dict(exclude_unset=True)
     result = await db.businesses.update_one({"_id": business_id}, {"$set": update_data})
-    if result.matched_count == 0:
-        raise HTTPException(status_code=404, detail="Business not found")
     return {"status": "success"}
+
+@app.post("/businesses")
+async def create_business(business: BusinessCreate, current_user: dict = Depends(get_current_user)):
+    db = get_database()
+    if not current_user.get("is_merchant") and not current_user.get("is_admin"):
+        raise HTTPException(status_code=403, detail="Only merchants can create businesses")
+        
+    slug = business.name.lower().replace(" ", "-") + "-" + str(uuid.uuid4())[:4]
+    
+    new_business = {
+        "_id": str(uuid.uuid4()),
+        "name": business.name,
+        "slug": slug,
+        "description": business.description,
+        "category": business.category,
+        "owner_email": current_user["email"],
+        "is_approved": False,
+        "products": [],
+        "logo": "",
+        "hero_image": "",
+        "whatsapp_link": ""
+    }
+    
+    await db.businesses.insert_one(new_business)
+    return sanitize_mongo_obj(new_business)
 
 @app.post("/products")
 async def create_product(product: ProductCreate, current_user: dict = Depends(get_current_user)):
     db = get_database()
+    
+    # Check ownership
+    existing = await db.businesses.find_one({"_id": product.business_id})
+    if not existing:
+        raise HTTPException(status_code=404, detail="Business not found")
+        
+    if not current_user.get("is_admin") and existing.get("owner_email") != current_user["email"]:
+        raise HTTPException(status_code=403, detail="Not authorized to add products to this business")
+        
     result = await db.businesses.update_one(
         {"_id": product.business_id},
         {"$push": {"products": product.dict()}}
     )
-    if result.matched_count == 0:
-        raise HTTPException(status_code=404, detail="Business not found")
     return product
 
 @app.delete("/products/{business_id}/{product_code}")
 async def delete_product(business_id: str, product_code: str, current_user: dict = Depends(get_current_user)):
     db = get_database()
+    
+    # Check ownership
+    existing = await db.businesses.find_one({"_id": business_id})
+    if not existing:
+        raise HTTPException(status_code=404, detail="Business not found")
+        
+    if not current_user.get("is_admin") and existing.get("owner_email") != current_user["email"]:
+        raise HTTPException(status_code=403, detail="Not authorized to delete products from this business")
+        
     result = await db.businesses.update_one(
         {"_id": business_id},
         {"$pull": {"products": {"code": product_code}}}

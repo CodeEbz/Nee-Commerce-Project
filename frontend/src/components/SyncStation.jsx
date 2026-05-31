@@ -19,7 +19,7 @@ export default function SyncStation({ onProductSynced }) {
     try {
       const encodedIdentifier = encodeURIComponent(identifier.trim());
 
-      const fetchWithTimeout = async (url, options = {}, timeout = 3000) => {
+      const fetchWithTimeout = async (url, options = {}, timeout = 15000) => {
         const controller = new AbortController();
         const id = setTimeout(() => controller.abort(), timeout);
         try {

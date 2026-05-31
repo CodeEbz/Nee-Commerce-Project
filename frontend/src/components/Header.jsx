@@ -1,4 +1,4 @@
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { ShoppingBag, ChevronRight, Menu, X, User as UserIcon, LogOut } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
@@ -27,6 +27,7 @@ const Header = ({ cart, onShowCheckout, totalAmount }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, logout } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -37,6 +38,7 @@ const Header = ({ cart, onShowCheckout, totalAmount }) => {
   }, []);
 
   const cartItemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const isAuthPage = ['/', '/login', '/signup'].includes(location.pathname);
 
   return (
     <header className={`header-wrapper ${isScrolled ? 'scrolled' : ''}`}>
@@ -48,66 +50,90 @@ const Header = ({ cart, onShowCheckout, totalAmount }) => {
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="desktop-nav">
-          <Link to="/" className={`nav-link ${location.pathname === '/' ? 'active' : ''}`}>Home</Link>
-          <Link to="/businesses" className={`nav-link ${location.pathname === '/businesses' ? 'active' : ''}`}>Explore</Link>
-          {user ? (
-            <Link to="/merchant" className={`nav-link ${location.pathname === '/merchant' ? 'active' : ''}`}>Dashboard</Link>
-          ) : (
-            <Link to="/login" className={`nav-link ${location.pathname === '/login' ? 'active' : ''}`}>Merchant Login</Link>
-          )}
-        </nav>
+        {!isAuthPage && (
+          <nav className="desktop-nav">
+            <Link to={user ? "/store" : "/"} className={`nav-link ${location.pathname === '/' || location.pathname === '/store' ? 'active' : ''}`}>Home</Link>
+            <Link to="/businesses" className={`nav-link ${location.pathname === '/businesses' ? 'active' : ''}`}>Explore</Link>
+            {user?.is_merchant && (
+              <Link to="/merchant" className={`nav-link ${location.pathname === '/merchant' ? 'active' : ''}`}>Merchant Dashboard</Link>
+            )}
+            {user?.is_admin && (
+              <Link to="/admin" className={`nav-link ${location.pathname === '/admin' ? 'active' : ''}`}>Admin Dashboard</Link>
+            )}
+            {!user && (
+              <Link to="/login" className={`nav-link ${location.pathname === '/login' ? 'active' : ''}`}>Merchant Login</Link>
+            )}
+          </nav>
+        )}
 
         {/* Header Actions */}
-        <div className="header-actions">
-          {/* User Section (Desktop) */}
-          {user && (
-            <div className="user-nav-item desktop-only" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginRight: '1rem' }}>
-              <div style={{ textAlign: 'right' }}>
-                <div style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-main)' }}>{user.nickname || user.full_name.split(' ')[0]}</div>
-                <button
-                  onClick={logout}
-                  style={{ background: 'none', border: 'none', padding: 0, fontSize: '0.75rem', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.25rem' }}
-                >
-                  <LogOut size={12} /> Logout
-                </button>
+        {!isAuthPage && (
+          <div className="header-actions">
+            {/* User Section (Desktop) */}
+            {user && (
+              <div className="user-nav-item desktop-only" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginRight: '1rem' }}>
+                <div style={{ textAlign: 'right' }}>
+                  <Link to="/profile" style={{ textDecoration: 'none', display: 'block' }}>
+                    <div style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-main)' }}>{user.nickname || user.full_name?.split(' ')[0]}</div>
+                  </Link>
+                  <button
+                    onClick={() => { logout(); navigate('/'); }}
+                    style={{ background: 'none', border: 'none', padding: 0, fontSize: '0.75rem', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.25rem' }}
+                  >
+                    <LogOut size={12} /> Logout
+                  </button>
+                </div>
+                <Link to="/profile">
+                  <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700, overflow: 'hidden' }}>
+                    {user.profile_picture ? (
+                      <img
+                        src={user.profile_picture.startsWith('http') ? user.profile_picture : `${API_URL}${user.profile_picture}`}
+                        alt="Avatar"
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      />
+                    ) : (
+                      user.full_name?.[0] || user.email?.[0]
+                    )}
+                  </div>
+                </Link>
               </div>
-              <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700 }}>
-                {user.full_name[0]}
-              </div>
-            </div>
-          )}
+            )}
 
-          {/* Cart Badge */}
-          <div className="cart-badge-trigger" onClick={onShowCheckout}>
-            <div className="cart-icon-wrapper">
-              <ShoppingBag size={20} />
-              {cartItemCount > 0 && <span className="cart-count">{cartItemCount}</span>}
+            {/* Cart Badge */}
+            <div className="cart-badge-trigger" onClick={onShowCheckout}>
+              <div className="cart-icon-wrapper">
+                <ShoppingBag size={20} />
+                {cartItemCount > 0 && <span className="cart-count">{cartItemCount}</span>}
+              </div>
+              <div className="cart-info">
+                <span className="cart-label">Cart</span>
+                {cartItemCount > 0 && <span className="cart-total">₦{totalAmount.toLocaleString()}</span>}
+              </div>
             </div>
-            <div className="cart-info">
-              <span className="cart-label">Cart</span>
-              {cartItemCount > 0 && <span className="cart-total">₦{totalAmount.toLocaleString()}</span>}
-            </div>
+
+            {/* Mobile Menu Toggle */}
+            <button className="mobile-menu-btn" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+              {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
           </div>
-
-          {/* Mobile Menu Toggle */}
-          <button className="mobile-menu-btn" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
-        </div>
+        )}
       </div>
 
       {/* Mobile Navigation Dropdown */}
       {mobileMenuOpen && (
         <div className="mobile-nav-overlay animate-fade">
           <nav className="mobile-nav">
-            <Link to="/" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>Home <ChevronRight size={16} /></Link>
+            <Link to={user ? "/store" : "/"} className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>Home <ChevronRight size={16} /></Link>
             <Link to="/businesses" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>Explore <ChevronRight size={16} /></Link>
+            <Link to="/profile" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>My Profile <ChevronRight size={16} /></Link>
+            {user?.is_merchant && (
+              <Link to="/merchant" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>Merchant Dashboard <ChevronRight size={16} /></Link>
+            )}
+            {user?.is_admin && (
+              <Link to="/admin" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>Admin Dashboard <ChevronRight size={16} /></Link>
+            )}
             {user ? (
-              <>
-                <Link to="/merchant" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>Merchant Dashboard <ChevronRight size={16} /></Link>
-                <div className="mobile-nav-link" onClick={() => { logout(); setMobileMenuOpen(false); }} style={{ color: '#EF4444' }}>Logout <LogOut size={16} /></div>
-              </>
+              <div className="mobile-nav-link" onClick={() => { logout(); navigate('/'); setMobileMenuOpen(false); }} style={{ color: '#EF4444' }}>Logout <LogOut size={16} /></div>
             ) : (
               <Link to="/login" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>Merchant Login <ChevronRight size={16} /></Link>
             )}

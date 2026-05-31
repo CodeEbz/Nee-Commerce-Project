@@ -116,7 +116,7 @@ export default function Landing({ onProductSynced }) {
             <p>Loading products...</p>
           ) : (
             featuredProducts.map(product => (
-              <div key={product.code} className="prod-card animate-fade">
+              <Link to={`/business/${product.business_slug}`} key={product.code} className="prod-card animate-fade" style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}>
                 <div className="prod-img-wrapper">
                   <img src={product.image} alt={product.name} />
                 </div>
@@ -125,12 +125,12 @@ export default function Landing({ onProductSynced }) {
                   <h3 style={{ fontSize: '1.25rem', marginBottom: '0.5rem' }}>{product.name}</h3>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div className="prod-price">₦{product.price.toLocaleString()}</div>
-                    <Link to={`/business/${product.business_slug}`} className="btn btn-primary" style={{ padding: '0.5rem' }}>
+                    <div className="btn btn-primary" style={{ padding: '0.5rem' }}>
                       <ShoppingBag size={18} />
-                    </Link>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </Link>
             ))
           )}
         </div>
@@ -148,11 +148,11 @@ export default function Landing({ onProductSynced }) {
             { name: 'Electronics', icon: <TrendingUp size={32} />, color: '#F0F9FF', count: '18+ Stores' },
             { name: 'Groceries', icon: <Star size={32} />, color: '#F0FDF4', count: '10+ Stores' },
           ].map(cat => (
-            <div key={cat.name} className="category-card" style={{ backgroundColor: cat.color }}>
+            <Link to={`/businesses?category=${cat.name}`} key={cat.name} className="category-card" style={{ backgroundColor: cat.color, textDecoration: 'none', display: 'block' }}>
               <div style={{ color: 'var(--accent)', marginBottom: '1rem', display: 'flex', justifyContent: 'center' }}>{cat.icon}</div>
-              <h3 style={{ fontSize: '1.125rem', marginBottom: '0.5rem' }}>{cat.name}</h3>
+              <h3 style={{ fontSize: '1.125rem', marginBottom: '0.5rem', color: 'var(--text-main)' }}>{cat.name}</h3>
               <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', margin: 0 }}>{cat.count}</p>
-            </div>
+            </Link>
           ))}
         </div>
       </section>

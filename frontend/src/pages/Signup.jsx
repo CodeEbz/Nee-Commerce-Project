@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { UserPlus, Mail, Lock, User, ArrowLeft, AlertCircle, CheckCircle } from 'lucide-react';
+import { UserPlus, Mail, Lock, User, ArrowLeft, AlertCircle, CheckCircle, Eye, EyeOff } from 'lucide-react';
 
 export default function Signup() {
   const [email, setEmail] = useState('');
@@ -10,17 +10,29 @@ export default function Signup() {
   const [nickname, setNickname] = useState('');
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [isMerchant, setIsMerchant] = useState(false);
 
-  const { signup } = useAuth();
+  const { signup, user } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user) {
+      navigate('/store', { replace: true });
+    }
+  }, [user, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
     try {
-      await signup(email, password, fullName, nickname);
-      navigate('/merchant');
+      await signup(email, password, fullName, nickname, isMerchant);
+      if (isMerchant) {
+        navigate('/merchant');
+      } else {
+        navigate('/store');
+      }
     } catch (err) {
       setError(err.message);
     } finally {
@@ -90,12 +102,47 @@ export default function Signup() {
             <div style={{ position: 'relative' }}>
               <Lock size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
               <input
-                type="password" required value={password} onChange={e => setPassword(e.target.value)}
+                type={showPassword ? "text" : "password"}
+                required
+                value={password}
+                onChange={e => setPassword(e.target.value)}
                 placeholder="Min. 8 characters"
                 className="input-field"
-                style={{ height: '3rem', paddingLeft: '3rem' }}
+                style={{ height: '3rem', paddingLeft: '3rem', paddingRight: '3rem' }}
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                style={{
+                  position: 'absolute',
+                  right: '1rem',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'none',
+                  border: 'none',
+                  color: 'var(--text-muted)',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '4px'
+                }}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
             </div>
+          </div>
+
+          <div style={{ marginBottom: '2.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <input
+              type="checkbox"
+              id="merchant-checkbox"
+              checked={isMerchant}
+              onChange={(e) => setIsMerchant(e.target.checked)}
+              style={{ width: '1.25rem', height: '1.25rem', accentColor: 'var(--accent)', cursor: 'pointer' }}
+            />
+            <label htmlFor="merchant-checkbox" style={{ fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
+              Sign up as a Merchant
+            </label>
           </div>
 
           <button type="submit" disabled={loading} className="btn btn-primary" style={{ width: '100%', height: '3.5rem', fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>

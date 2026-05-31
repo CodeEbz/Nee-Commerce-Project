@@ -11,7 +11,8 @@ import HowItWorks from './pages/HowItWorks'
 import MerchantDashboard from './pages/MerchantDashboard'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
-import { AuthProvider } from './context/AuthContext'
+import Profile from './pages/Profile'
+import { AuthProvider, useAuth } from './context/AuthContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import { API_URL } from './config'
 
@@ -138,8 +139,23 @@ function App() {
           )}
 
           <Routes>
-            <Route path="/" element={<Landing cart={cart} onProductSynced={addToCart} />} />
-            <Route path="/businesses" element={<Businesses />} />
+            <Route path="/" element={<Login />} />
+            <Route
+              path="/store"
+              element={
+                <ProtectedRoute>
+                  <Landing cart={cart} onProductSynced={addToCart} />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/businesses"
+              element={
+                <ProtectedRoute>
+                  <Businesses />
+                </ProtectedRoute>
+              }
+            />
             <Route path="/how-it-works" element={<HowItWorks />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
@@ -151,12 +167,27 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            <Route path="/business/:slug" element={<BusinessDetail onProductSynced={addToCart} />} />
+            <Route
+              path="/business/:slug"
+              element={
+                <ProtectedRoute>
+                  <BusinessDetail onProductSynced={addToCart} />
+                </ProtectedRoute>
+              }
+            />
             <Route
               path="/admin"
               element={
                 <ProtectedRoute adminOnly={true}>
                   <Admin />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <Profile />
                 </ProtectedRoute>
               }
             />
@@ -169,9 +200,11 @@ function App() {
 
 // Checkout Modal Component
 function CheckoutModal({ cart, onClose, onCheckout, onUpdateQuantity, onRemoveItem, loading, total }) {
+  const { user } = useAuth();
+  
   const [customerData, setCustomerData] = useState({
-    customer_name: '',
-    customer_email: '',
+    customer_name: user?.full_name || '',
+    customer_email: user?.email || '',
     customer_phone: ''
   });
 

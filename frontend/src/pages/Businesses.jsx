@@ -6,7 +6,7 @@ import { API_URL } from '../config';
 export default function Businesses() {
   const [businesses, setBusinesses] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState(new URLSearchParams(window.location.search).get('category') || '');
 
   useEffect(() => {
     const fetchData = async () => {

@@ -72,11 +72,11 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const signup = async (email, password, fullName, nickname) => {
+  const signup = async (email, password, fullName, nickname, isMerchant = false) => {
     const response = await fetch(`${API_URL}/auth/signup`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password, full_name: fullName, nickname }),
+      body: JSON.stringify({ email, password, full_name: fullName, nickname, is_merchant: isMerchant }),
     });
 
     if (!response.ok) {
@@ -94,7 +94,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, signup, logout, loading }}>
+    <AuthContext.Provider value={{ user, token, login, signup, logout, loading, fetchUser }}>
       {children}
     </AuthContext.Provider>
   );

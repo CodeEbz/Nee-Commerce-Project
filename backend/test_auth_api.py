@@ -4,13 +4,15 @@ import time
 BASE_URL = "http://localhost:8000"
 
 def test_signup():
-    print("Testing signup...")
+    print("Testing signup for admin...")
     payload = {
-        "email": f"test_{int(time.time())}@example.com",
-        "nickname": "tester",
+        "email": "ebzchin@gmail.com",
+        "nickname": "admin",
         "password": "password123",
-        "full_name": "Test User"
+        "full_name": "Ebz Chin"
     }
+    # First, let's try to delete the user if it exists to ensure a fresh signup
+    # This is a bit advanced for a test script, so we'll just handle 400
     response = requests.post(f"{BASE_URL}/auth/signup", json=payload)
     print(f"Signup response: {response.status_code}, {response.json()}")
     return payload["email"], payload["password"]
