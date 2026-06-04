@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { ShoppingBag, ChevronRight, Menu, X, User as UserIcon, LogOut } from 'lucide-react'
+import { ShoppingBag, ChevronRight, Menu, X, User as UserIcon, LogOut, Search } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
 
@@ -69,37 +69,12 @@ const Header = ({ cart, onShowCheckout, totalAmount }) => {
         {/* Header Actions */}
         {!isAuthPage && (
           <div className="header-actions">
-            {/* User Section (Desktop) */}
-            {user && (
-              <div className="user-nav-item desktop-only" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginRight: '1rem' }}>
-                <div style={{ textAlign: 'right' }}>
-                  <Link to="/profile" style={{ textDecoration: 'none', display: 'block' }}>
-                    <div style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-main)' }}>{user.nickname || user.full_name?.split(' ')[0]}</div>
-                  </Link>
-                  <button
-                    onClick={() => { logout(); navigate('/'); }}
-                    style={{ background: 'none', border: 'none', padding: 0, fontSize: '0.75rem', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.25rem' }}
-                  >
-                    <LogOut size={12} /> Logout
-                  </button>
-                </div>
-                <Link to="/profile">
-                  <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700, overflow: 'hidden' }}>
-                    {user.profile_picture ? (
-                      <img
-                        src={user.profile_picture.startsWith('http') ? user.profile_picture : `${API_URL}${user.profile_picture}`}
-                        alt="Avatar"
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                      />
-                    ) : (
-                      user.full_name?.[0] || user.email?.[0]
-                    )}
-                  </div>
-                </Link>
-              </div>
-            )}
+            {/* Search icon */}
+            <Link to="/search" className="header-icon-btn" title="Search">
+              <Search size={18} />
+            </Link>
 
-            {/* Cart Badge */}
+            {/* Cart */}
             <div className="cart-badge-trigger" onClick={onShowCheckout}>
               <div className="cart-icon-wrapper">
                 <ShoppingBag size={20} />
@@ -111,9 +86,22 @@ const Header = ({ cart, onShowCheckout, totalAmount }) => {
               </div>
             </div>
 
+            {/* User avatar — desktop only */}
+            {user && (
+              <div className="desktop-only" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <Link to="/profile" title={user.full_name}>
+                  <div style={{ width: '34px', height: '34px', borderRadius: '50%', background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700, fontSize: '0.9rem', overflow: 'hidden', flexShrink: 0 }}>
+                    {user.profile_picture ? (
+                      <img src={user.profile_picture.startsWith('http') ? user.profile_picture : `${API_URL}${user.profile_picture}`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    ) : (user.full_name?.[0] || user.email?.[0])}
+                  </div>
+                </Link>
+              </div>
+            )}
+
             {/* Mobile Menu Toggle */}
             <button className="mobile-menu-btn" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-              {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
             </button>
           </div>
         )}
@@ -125,6 +113,7 @@ const Header = ({ cart, onShowCheckout, totalAmount }) => {
           <nav className="mobile-nav">
             <Link to={user ? "/store" : "/"} className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>Home <ChevronRight size={16} /></Link>
             <Link to="/businesses" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>Explore <ChevronRight size={16} /></Link>
+            <Link to="/search" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>Search <ChevronRight size={16} /></Link>
             <Link to="/profile" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>My Profile <ChevronRight size={16} /></Link>
             {user?.is_merchant && (
               <Link to="/merchant" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>Merchant Dashboard <ChevronRight size={16} /></Link>

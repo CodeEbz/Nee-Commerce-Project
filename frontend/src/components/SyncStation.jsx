@@ -51,48 +51,31 @@ export default function SyncStation({ onProductSynced }) {
   };
 
   return (
-    <div className="glass sync-station animate-fade" style={{
+    <div style={{
       background: 'linear-gradient(135deg, var(--primary), #1E293B)',
       color: 'white',
-      padding: '2.5rem',
-      borderRadius: 'var(--radius-xl)',
+      padding: 'clamp(1.25rem, 4vw, 2rem)',
+      borderRadius: 'var(--radius-lg)',
       border: '1px solid rgba(255,255,255,0.1)',
-      position: 'relative',
+      width: '100%',
+      boxSizing: 'border-box',
       overflow: 'hidden'
     }}>
-      {/* Background decoration */}
-      <div style={{
-        position: 'absolute',
-        top: '-50%',
-        right: '-20%',
-        width: '200px',
-        height: '200px',
-        background: 'radial-gradient(circle, rgba(59, 130, 246, 0.1), transparent)',
-        borderRadius: '50%',
-        pointerEvents: 'none'
-      }}></div>
-
       <div style={{ position: 'relative', zIndex: 1 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-          <div style={{
-            background: 'rgba(59, 130, 246, 0.2)',
-            padding: '0.5rem',
-            borderRadius: '50%',
-            border: '1px solid rgba(59, 130, 246, 0.3)'
-          }}>
-            <Smartphone size={20} color="#60A5FA" />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
+          <div style={{ background: 'rgba(59,130,246,0.2)', padding: '0.4rem', borderRadius: '50%', border: '1px solid rgba(59,130,246,0.3)', flexShrink: 0 }}>
+            <Smartphone size={18} color="#60A5FA" />
           </div>
-          <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 700 }}>WhatsApp Sync Station</h3>
+          <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>WhatsApp Sync Station</h3>
         </div>
-
-        <p style={{ opacity: 0.8, fontSize: '0.95rem', marginBottom: '2rem', lineHeight: 1.5 }}>
-          Found something you like? Paste the <strong>WhatsApp Product Link</strong> or <strong>Product ID</strong> below to instantly sync it to your cart.
+        <p style={{ opacity: 0.75, fontSize: '0.875rem', marginBottom: '1.25rem', lineHeight: 1.5 }}>
+          Paste a WhatsApp product link or ID to sync it to your cart.
         </p>
 
-        <form onSubmit={handleSync}>
-          <div style={{ position: 'relative', marginBottom: '1.5rem' }}>
-            <div style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.4)' }}>
-              <LinkIcon size={18} />
+          <form onSubmit={handleSync}>
+          <div style={{ position: 'relative', marginBottom: '1rem' }}>
+            <div style={{ position: 'absolute', left: '0.85rem', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.4)', pointerEvents: 'none' }}>
+              <LinkIcon size={16} />
             </div>
             <input
               type="text"
@@ -101,23 +84,17 @@ export default function SyncStation({ onProductSynced }) {
               placeholder="https://wa.me/p/... or Product ID"
               style={{
                 width: '100%',
-                padding: '1.25rem 1rem 1.25rem 3rem',
+                boxSizing: 'border-box',
+                padding: '0.9rem 0.85rem 0.9rem 2.75rem',
                 borderRadius: 'var(--radius-md)',
-                border: '2px solid rgba(255,255,255,0.15)',
+                border: '1.5px solid rgba(255,255,255,0.15)',
                 background: 'rgba(255,255,255,0.08)',
                 color: 'white',
-                fontSize: '1rem',
+                fontSize: '0.95rem',
                 outline: 'none',
-                transition: 'all 0.3s ease'
               }}
-              onFocus={(e) => {
-                e.target.style.borderColor = 'rgba(59, 130, 246, 0.5)';
-                e.target.style.background = 'rgba(255,255,255,0.12)';
-              }}
-              onBlur={(e) => {
-                e.target.style.borderColor = 'rgba(255,255,255,0.15)';
-                e.target.style.background = 'rgba(255,255,255,0.08)';
-              }}
+              onFocus={e => { e.target.style.borderColor = 'rgba(59,130,246,0.5)'; e.target.style.background = 'rgba(255,255,255,0.12)'; }}
+              onBlur={e => { e.target.style.borderColor = 'rgba(255,255,255,0.15)'; e.target.style.background = 'rgba(255,255,255,0.08)'; }}
             />
           </div>
 

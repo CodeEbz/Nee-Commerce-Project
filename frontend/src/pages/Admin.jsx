@@ -1,8 +1,31 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Package, Users, TrendingUp, Calendar, Store, LogOut } from 'lucide-react';
+import { Package, Users, TrendingUp, Calendar, Store, LogOut, ChevronDown } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { API_URL } from '../config';
+
+const StatCard = ({ icon, value, label, color }) => (
+  <div style={{ background: 'white', padding: '1.25rem', borderRadius: 'var(--radius-lg)', border: '1px solid #E5E7EB', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+    <div style={{ background: color, color: 'white', width: '48px', height: '48px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+      {icon}
+    </div>
+    <div>
+      <div style={{ fontSize: 'clamp(1.25rem, 4vw, 1.75rem)', fontWeight: 800, color, lineHeight: 1 }}>{value}</div>
+      <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>{label}</div>
+    </div>
+  </div>
+);
+
+const StatusBadge = ({ status }) => (
+  <span style={{
+    padding: '0.2rem 0.6rem', borderRadius: 'var(--radius-full)',
+    fontSize: '0.7rem', fontWeight: 700,
+    background: status === 'completed' ? '#ECFDF5' : '#FEF2F2',
+    color: status === 'completed' ? '#10B981' : '#EF4444'
+  }}>
+    {status?.toUpperCase()}
+  </span>
+);
 
 export default function Admin() {
   const [orders, setOrders] = useState([]);
@@ -10,305 +33,246 @@ export default function Admin() {
   const [businesses, setBusinesses] = useState([]);
   const [analytics, setAnalytics] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState({
-    totalOrders: 0,
-    totalRevenue: 0,
-    totalCustomers: 0,
-    totalProducts: 0
-  });
-  const [activeView, setActiveView] = useState('overview'); // 'overview', 'users', 'businesses', 'analytics'
   const [error, setError] = useState(null);
+  const [stats, setStats] = useState({ totalOrders: 0, totalRevenue: 0, totalCustomers: 0, totalProducts: 0 });
+  const [activeView, setActiveView] = useState('overview');
   const { token, logout, user } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchOrders();
-    fetchAdminData();
-    fetchAnalytics();
-
-    // Check for mock success parameter (for local testing)
-    const urlParams = new URLSearchParams(window.location.search);
-    const mockId = urlParams.get('mock_success');
-    if (mockId) {
-      simulateWebhook(mockId);
-    }
+    Promise.all([fetchOrders(), fetchAdminData(), fetchAnalytics()]).finally(() => setLoading(false));
+    const mockId = new URLSearchParams(window.location.search).get('mock_success');
+    if (mockId) simulateWebhook(mockId);
   }, []);
+
+  const authFetch = (url, opts = {}) =>
+    fetch(url, { ...opts, headers: { 'Authorization': `Bearer ${token}`, ...opts.headers } });
 
   const fetchAnalytics = async () => {
     try {
-      const headers = { 'Authorization': `Bearer ${token}` };
-      const response = await fetch(`${API_URL}/admin/analytics`, { headers });
-      if (response.ok) {
-        setAnalytics(await response.json());
-      }
-    } catch (e) {
-      console.error("Admin analytics fetch error:", e);
-    }
-  };
-
-  const simulateWebhook = async (orderId) => {
-    console.log('Simulating webhook for order:', orderId);
-
-    const sendWebhook = async () => {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 3000);
-      try {
-        const response = await fetch(`${API_URL}/webhook/paystack`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify({
-            event: 'charge.success',
-            data: { reference: orderId }
-          }),
-          signal: controller.signal
-        });
-        clearTimeout(timeoutId);
-        return response;
-      } catch (err) {
-        clearTimeout(timeoutId);
-        throw err;
-      }
-    };
-
-    try {
-      await sendWebhook();
-
-      // Refresh to show "Completed"
-      fetchOrders();
-    } catch (e) {
-      console.error('Webhook simulation failed', e);
-    }
-  };
-
-  const fetchWithTimeout = async (url, options = {}, timeout = 3000) => {
-    const controller = new AbortController();
-    const id = setTimeout(() => controller.abort(), timeout);
-    try {
-      const response = await fetch(url, { ...options, signal: controller.signal });
-      clearTimeout(id);
-      return response;
-    } catch (error) {
-      clearTimeout(id);
-      throw error;
-    }
+      const r = await authFetch(`${API_URL}/admin/analytics`);
+      if (r.ok) setAnalytics(await r.json());
+    } catch (e) { console.error(e); }
   };
 
   const fetchAdminData = async () => {
     try {
-      const headers = { 'Authorization': `Bearer ${token}` };
       const [uRes, bRes] = await Promise.all([
-        fetch(`${API_URL}/admin/users`, { headers }),
-        fetch(`${API_URL}/admin/businesses`, { headers })
+        authFetch(`${API_URL}/admin/users`),
+        authFetch(`${API_URL}/admin/businesses`)
       ]);
-
       if (uRes.ok) setUsers(await uRes.json());
       if (bRes.ok) setBusinesses(await bRes.json());
-    } catch (e) {
-      console.error("Admin data fetch error:", e);
-    }
+    } catch (e) { console.error(e); }
   };
 
   const fetchOrders = async () => {
-    setLoading(true);
     setError(null);
     try {
-      console.log('Fetching orders...');
-      const headers = { 'Authorization': `Bearer ${token}` };
-      const response = await fetchWithTimeout(`${API_URL}/orders`, { headers });
-
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-
-      const data = await response.json();
-      console.log('Orders received:', data);
-
-      if (!Array.isArray(data)) {
-        throw new Error('Data received is not an array');
-      }
-
+      const r = await authFetch(`${API_URL}/orders`);
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      const data = await r.json();
+      if (!Array.isArray(data)) throw new Error('Invalid response');
       setOrders(data);
-
-      // Calculate stats safely
-      const totalRevenue = data.reduce((sum, order) => sum + (order.total_amount || 0), 0);
-      const uniqueCustomers = new Set(data.filter(o => o.customer_email).map(order => order.customer_email)).size;
-      const totalProducts = data.reduce((sum, order) =>
-        sum + (order.items || []).reduce((itemSum, item) => itemSum + (item.quantity || 0), 0), 0
-      );
-
       setStats({
         totalOrders: data.length,
-        totalRevenue,
-        totalCustomers: uniqueCustomers,
-        totalProducts
+        totalRevenue: data.reduce((s, o) => s + (o.total_amount || 0), 0),
+        totalCustomers: new Set(data.filter(o => o.customer_email).map(o => o.customer_email)).size,
+        totalProducts: data.reduce((s, o) => s + (o.items || []).reduce((is, i) => is + (i.quantity || 0), 0), 0)
       });
-    } catch (error) {
-      console.error('Failed to fetch orders:', error);
-      setError(error.message);
-    } finally {
-      setLoading(false);
-    }
+    } catch (e) { setError(e.message); }
+  };
+
+  const simulateWebhook = async (orderId) => {
+    try {
+      await authFetch(`${API_URL}/webhook/paystack`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ event: 'charge.success', data: { reference: orderId } })
+      });
+      fetchOrders();
+    } catch (e) { console.error(e); }
   };
 
   const handleApprove = async (businessId) => {
     try {
-      const response = await fetch(`${API_URL}/admin/businesses/${businessId}/approve`, {
-        method: 'PUT',
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (!response.ok) throw new Error('Failed to approve business');
-      
-      alert('Business approved successfully!');
+      const r = await authFetch(`${API_URL}/admin/businesses/${businessId}/approve`, { method: 'PUT' });
+      if (!r.ok) throw new Error('Failed');
+      alert('Business approved!');
       fetchAdminData();
-    } catch (err) {
-      alert(`Error approving business: ${err.message}`);
-    }
+    } catch (e) { alert(e.message); }
   };
 
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
+  const formatDate = (d) => d ? new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit', hour: '2-digit', minute: '2-digit' }) : 'N/A';
 
-  if (loading) {
-    return (
-      <div className="loading-state" style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ width: '40px', height: '40px', border: '3px solid var(--accent)', borderTop: '3px solid transparent', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 1rem' }}></div>
-          Loading Admin Dashboard...
-        </div>
-      </div>
-    );
-  }
+  const TABS = [
+    { key: 'overview', label: 'Overview', icon: <TrendingUp size={16} /> },
+    { key: 'analytics', label: 'Analytics', icon: <Package size={16} /> },
+    { key: 'users', label: `Users (${users.length})`, icon: <Users size={16} /> },
+    { key: 'businesses', label: `Businesses (${businesses.length})`, icon: <Store size={16} /> },
+  ];
 
-  if (error) {
-    return (
-      <div className="error-state" style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
-        <div className="glass" style={{ textAlign: 'center', padding: '3rem', borderRadius: 'var(--radius-lg)', maxWidth: '500px' }}>
-          <h2 style={{ color: '#EF4444', marginBottom: '1rem' }}>Connection Error</h2>
-          <p style={{ marginBottom: '1rem', color: 'var(--text-muted)' }}>The admin dashboard couldn't connect to the backend server.</p>
-          <div style={{ background: '#FEF2F2', padding: '1rem', borderRadius: 'var(--radius-md)', marginBottom: '2rem', fontSize: '0.875rem', color: '#B91C1C', textAlign: 'left' }}>
-            <strong>Possible reasons:</strong>
-            <ul style={{ margin: '0.5rem 0 0', paddingLeft: '1.25rem' }}>
-              <li>The backend server is not running.</li>
-              <li>The server is running on a different port.</li>
-              <li>A firewall is blocking the connection.</li>
-            </ul>
-          </div>
-          <button onClick={() => { setError(null); fetchOrders(); }} className="btn btn-primary" style={{ width: '100%' }}>Retry Connection</button>
-          <p style={{ marginTop: '1rem', fontSize: '0.75rem', color: 'var(--text-muted)' }}>Technical error: {error}</p>
-        </div>
+  if (loading) return (
+    <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ textAlign: 'center' }}>
+        <div style={{ width: '36px', height: '36px', border: '3px solid var(--accent)', borderTop: '3px solid transparent', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 1rem' }} />
+        <p style={{ color: 'var(--text-muted)' }}>Loading Dashboard...</p>
       </div>
-    );
-  }
+    </div>
+  );
+
+  if (error) return (
+    <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
+      <div style={{ textAlign: 'center', maxWidth: '400px' }}>
+        <h2 style={{ color: '#EF4444', marginBottom: '1rem' }}>Connection Error</h2>
+        <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem', fontSize: '0.9rem' }}>{error}</p>
+        <button onClick={() => { setError(null); fetchOrders(); }} className="btn btn-primary" style={{ width: '100%' }}>Retry</button>
+      </div>
+    </div>
+  );
 
   return (
-    <div className="admin-page" style={{ minHeight: '100vh', background: 'var(--bg-main)' }}>
-      {/* Header */}
-      <header style={{ background: 'var(--primary)', color: 'white', padding: '2rem' }}>
-        <div className="app-container">
-          <Link to="/" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
-            <ArrowLeft size={20} /> Back to Store
-          </Link>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    <div style={{ minHeight: '100vh', background: 'var(--bg-main)' }}>
+      {/* Page Header */}
+      <div style={{ background: 'var(--primary)', color: 'white', padding: 'clamp(1.25rem, 4vw, 2rem)' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem' }}>
             <div>
-              <h1 style={{ fontSize: '2.5rem', margin: 0 }}>Admin Dashboard</h1>
-              <p style={{ opacity: 0.8, margin: '0.5rem 0 0' }}>Monitor platform-wide operations</p>
+              <h1 style={{ fontSize: 'clamp(1.4rem, 4vw, 2rem)', margin: '0 0 0.25rem' }}>Admin Dashboard</h1>
+              <p style={{ opacity: 0.75, margin: 0, fontSize: '0.875rem' }}>Logged in as <strong>{user?.full_name}</strong></p>
             </div>
-            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-              <span style={{ fontSize: '0.875rem', opacity: 0.8 }}>Logged in as <strong>{user?.full_name}</strong></span>
-              <button onClick={() => { logout(); navigate('/login'); }} className="btn btn-outline" style={{ color: 'white', borderColor: 'rgba(255,255,255,0.3)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <LogOut size={18} /> Logout
+            <button onClick={() => { logout(); navigate('/login'); }} style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.25)', color: 'white', padding: '0.5rem 1rem', borderRadius: 'var(--radius-md)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.875rem', fontWeight: 600, flexShrink: 0 }}>
+              <LogOut size={15} /> Logout
+            </button>
+          </div>
+
+          {/* Tab Nav */}
+          <div style={{ display: 'flex', gap: '0.4rem', overflowX: 'auto', WebkitOverflowScrolling: 'touch', paddingBottom: '0.25rem' }}>
+            {TABS.map(tab => (
+              <button key={tab.key} onClick={() => setActiveView(tab.key)} style={{
+                display: 'flex', alignItems: 'center', gap: '0.4rem',
+                padding: '0.5rem 1rem', borderRadius: 'var(--radius-full)',
+                border: 'none', cursor: 'pointer', fontWeight: 600, fontSize: '0.82rem',
+                whiteSpace: 'nowrap', transition: 'all 0.2s', flexShrink: 0,
+                background: activeView === tab.key ? 'white' : 'rgba(255,255,255,0.12)',
+                color: activeView === tab.key ? 'var(--primary)' : 'rgba(255,255,255,0.85)',
+              }}>
+                {tab.icon} {tab.label}
               </button>
-            </div>
+            ))}
           </div>
         </div>
-      </header>
+      </div>
 
-      <div className="app-container" style={{ padding: '2rem' }}>
-        {/* Admin Navigation */}
-        <div style={{ display: 'flex', gap: '1rem', marginBottom: '2.5rem', overflowX: 'auto', paddingBottom: '0.5rem' }}>
-          <button
-            onClick={() => setActiveView('overview')}
-            className={`btn ${activeView === 'overview' ? 'btn-primary' : 'btn-outline'}`}
-            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', whiteSpace: 'nowrap' }}
-          >
-            <TrendingUp size={20} /> Overview
-          </button>
-          <button
-            onClick={() => setActiveView('analytics')}
-            className={`btn ${activeView === 'analytics' ? 'btn-primary' : 'btn-outline'}`}
-            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', whiteSpace: 'nowrap' }}
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
-            Analytics
-          </button>
-          <button
-            onClick={() => setActiveView('users')}
-            className={`btn ${activeView === 'users' ? 'btn-primary' : 'btn-outline'}`}
-            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', whiteSpace: 'nowrap' }}
-          >
-            <Users size={20} /> Manage Users
-          </button>
-          <button
-            onClick={() => setActiveView('businesses')}
-            className={`btn ${activeView === 'businesses' ? 'btn-primary' : 'btn-outline'}`}
-            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', whiteSpace: 'nowrap' }}
-          >
-            <Store size={20} /> Manage Businesses
-          </button>
-        </div>
+      {/* Content */}
+      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: 'clamp(1rem, 4vw, 2rem)' }}>
 
+        {/* ── OVERVIEW ── */}
+        {activeView === 'overview' && (
+          <div className="animate-fade">
+            {/* Stats */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 240px), 1fr))', gap: '1rem', marginBottom: '2rem' }}>
+              <StatCard icon={<Package size={22} />} value={stats.totalOrders} label="Total Orders" color="var(--accent)" />
+              <StatCard icon={<TrendingUp size={22} />} value={`₦${stats.totalRevenue.toLocaleString()}`} label="Total Revenue" color="#10B981" />
+              <StatCard icon={<Users size={22} />} value={stats.totalCustomers} label="Unique Customers" color="#F59E0B" />
+              <StatCard icon={<Package size={22} />} value={stats.totalProducts} label="Products Sold" color="#8B5CF6" />
+            </div>
+
+            {/* Orders */}
+            <div style={{ background: 'white', borderRadius: 'var(--radius-lg)', border: '1px solid #E5E7EB', overflow: 'hidden' }}>
+              <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid #E5E7EB', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <Calendar size={18} color="var(--accent)" />
+                <h2 style={{ margin: 0, fontSize: '1.1rem' }}>Recent Orders</h2>
+              </div>
+
+              {orders.length === 0 ? (
+                <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+                  <Package size={40} style={{ margin: '0 auto 1rem', opacity: 0.3 }} />
+                  <p>No orders yet.</p>
+                </div>
+              ) : (
+                <>
+                  {/* Desktop table */}
+                  <div className="admin-table-desktop" style={{ overflowX: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.875rem' }}>
+                      <thead>
+                        <tr style={{ borderBottom: '1px solid #E5E7EB', background: '#F9FAFB' }}>
+                          {['Order ID', 'Customer', 'Items', 'Total', 'Date', 'Status'].map(h => (
+                            <th key={h} style={{ padding: '0.85rem 1rem', textAlign: 'left', fontWeight: 700, color: 'var(--text-muted)', fontSize: '0.75rem', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{h}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {orders.map(order => (
+                          <tr key={order.id} style={{ borderBottom: '1px solid #F3F4F6' }}>
+                            <td style={{ padding: '0.85rem 1rem', fontFamily: 'monospace', fontSize: '0.8rem', color: 'var(--text-muted)' }}>{order.id?.slice(-8)}</td>
+                            <td style={{ padding: '0.85rem 1rem' }}>
+                              <div style={{ fontWeight: 600 }}>{order.customer_name}</div>
+                              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{order.customer_email}</div>
+                            </td>
+                            <td style={{ padding: '0.85rem 1rem' }}>
+                              {(order.items || []).map((item, i) => (
+                                <div key={i} style={{ fontSize: '0.8rem' }}>{item.quantity}× {item.name}</div>
+                              ))}
+                            </td>
+                            <td style={{ padding: '0.85rem 1rem', fontWeight: 700, color: 'var(--accent)', whiteSpace: 'nowrap' }}>₦{order.total_amount?.toLocaleString()}</td>
+                            <td style={{ padding: '0.85rem 1rem', whiteSpace: 'nowrap', color: 'var(--text-muted)', fontSize: '0.8rem' }}>{formatDate(order.created_at)}</td>
+                            <td style={{ padding: '0.85rem 1rem' }}><StatusBadge status={order.status} /></td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* Mobile cards */}
+                  <div className="admin-cards-mobile" style={{ display: 'none', flexDirection: 'column', gap: '0.75rem', padding: '1rem' }}>
+                    {orders.map(order => (
+                      <div key={order.id} style={{ background: 'var(--bg-main)', borderRadius: 'var(--radius-md)', padding: '1rem', border: '1px solid #E5E7EB' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
+                          <div>
+                            <div style={{ fontWeight: 700, fontSize: '0.9rem' }}>{order.customer_name}</div>
+                            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{order.customer_email}</div>
+                          </div>
+                          <StatusBadge status={order.status} />
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.8rem' }}>
+                          <div style={{ color: 'var(--text-muted)' }}>
+                            {(order.items || []).slice(0, 2).map((item, i) => (
+                              <span key={i}>{item.quantity}× {item.name}{i < Math.min(order.items.length, 2) - 1 ? ', ' : ''}</span>
+                            ))}
+                            {order.items?.length > 2 && <span> +{order.items.length - 2} more</span>}
+                          </div>
+                          <div style={{ fontWeight: 800, color: 'var(--accent)', whiteSpace: 'nowrap', marginLeft: '0.5rem' }}>₦{order.total_amount?.toLocaleString()}</div>
+                        </div>
+                        <div style={{ fontSize: '0.7rem', color: '#94A3B8', marginTop: '0.5rem' }}>{formatDate(order.created_at)}</div>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ── ANALYTICS ── */}
         {activeView === 'analytics' && (
           <div className="animate-fade">
-            <h2 style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-               Advanced Analytics
-            </h2>
-            
             {!analytics ? (
-              <div className="glass" style={{ padding: '3rem', textAlign: 'center', borderRadius: 'var(--radius-lg)' }}>
-                 Loading analytics data...
-              </div>
+              <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>Loading analytics...</div>
             ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 2fr) minmax(0, 1fr)', gap: '2rem', alignItems: 'start' }}>
-                
-                {/* Daily Revenue Chart */}
-                <div className="glass" style={{ padding: '2rem', borderRadius: 'var(--radius-lg)' }}>
-                  <h3 style={{ marginBottom: '1.5rem', fontSize: '1.25rem' }}>Daily Revenue (Last 30 Days)</h3>
-                  
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                {/* Chart */}
+                <div style={{ background: 'white', padding: 'clamp(1rem, 3vw, 1.75rem)', borderRadius: 'var(--radius-lg)', border: '1px solid #E5E7EB' }}>
+                  <h3 style={{ marginBottom: '1.5rem', fontSize: '1rem' }}>Revenue Trend (Last 30 Days)</h3>
                   {analytics.dailyRevenue?.length === 0 ? (
-                    <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>No revenue data available yet.</div>
+                    <p style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '2rem' }}>No revenue data yet.</p>
                   ) : (
-                    <div style={{ height: '300px', display: 'flex', alignItems: 'flex-end', gap: '8px', paddingBottom: '2rem', position: 'relative', borderBottom: '1px solid #E5E7EB' }}>
-                      {/* CSS Bar Chart */}
+                    <div style={{ height: '200px', display: 'flex', alignItems: 'flex-end', gap: '4px', borderBottom: '1px solid #E5E7EB', paddingBottom: '2rem' }}>
                       {analytics.dailyRevenue.map((day, idx) => {
-                        const maxRev = Math.max(...analytics.dailyRevenue.map(d => d.revenue)) || 1;
-                        const heightPct = (day.revenue / maxRev) * 100;
-                        
+                        const max = Math.max(...analytics.dailyRevenue.map(d => d.revenue)) || 1;
                         return (
-                          <div key={idx} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem', group: 'bar' }}>
-                            <div 
-                              style={{ 
-                                width: '100%', 
-                                height: `${heightPct}%`, 
-                                minHeight: '4px',
-                                background: 'linear-gradient(to top, var(--accent), var(--accent-light))',
-                                borderRadius: '4px 4px 0 0',
-                                transition: 'height 0.5s ease',
-                                position: 'relative',
-                                cursor: 'crosshair'
-                              }}
-                              title={`₦${day.revenue.toLocaleString()}`}
-                            />
-                            <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', transform: 'rotate(-45deg)', transformOrigin: 'top left', marginTop: '4px', whiteSpace: 'nowrap' }}>
-                              {day.date}
-                            </div>
+                          <div key={idx} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                            <div style={{ width: '100%', height: `${(day.revenue / max) * 100}%`, minHeight: '4px', background: 'linear-gradient(to top, var(--accent), var(--accent-light))', borderRadius: '3px 3px 0 0' }} title={`₦${day.revenue.toLocaleString()}`} />
                           </div>
                         );
                       })}
@@ -316,251 +280,104 @@ export default function Admin() {
                   )}
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-                  {/* Top Products */}
-                  <div className="glass" style={{ padding: '2rem', borderRadius: 'var(--radius-lg)' }}>
-                    <h3 style={{ marginBottom: '1.5rem', fontSize: '1.25rem' }}>Top Selling Products</h3>
-                    {analytics.topProducts?.length === 0 ? (
-                      <div style={{ textAlign: 'center', color: 'var(--text-muted)' }}>No products sold yet.</div>
-                    ) : (
-                      <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                        {analytics.topProducts.map((prod, idx) => (
-                          <li key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem', background: '#F8FAFC', borderRadius: 'var(--radius-md)' }}>
-                            <span style={{ fontWeight: 600, fontSize: '0.9rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '70%' }}>{prod.name}</span>
-                            <span className="badge badge-accent">{prod.sales} sold</span>
-                          </li>
+                {/* Top products & businesses */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))', gap: '1.25rem' }}>
+                  <div style={{ background: 'white', padding: '1.5rem', borderRadius: 'var(--radius-lg)', border: '1px solid #E5E7EB' }}>
+                    <h3 style={{ marginBottom: '1.25rem', fontSize: '1rem' }}>Top Products</h3>
+                    {(analytics.topProducts || []).length === 0 ? <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>None yet.</p> : (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                        {analytics.topProducts.map((p, i) => (
+                          <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.6rem 0.75rem', background: 'var(--bg-main)', borderRadius: 'var(--radius-sm)' }}>
+                            <span style={{ fontSize: '0.875rem', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '70%' }}>{p.name}</span>
+                            <span className="badge badge-accent">{p.sales} sold</span>
+                          </div>
                         ))}
-                      </ul>
+                      </div>
                     )}
                   </div>
-
-                  {/* Top Businesses */}
-                  <div className="glass" style={{ padding: '2rem', borderRadius: 'var(--radius-lg)' }}>
-                    <h3 style={{ marginBottom: '1.5rem', fontSize: '1.25rem' }}>Top Businesses</h3>
-                    {analytics.topBusinesses?.length === 0 ? (
-                      <div style={{ textAlign: 'center', color: 'var(--text-muted)' }}>No sales recorded.</div>
-                    ) : (
-                      <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                        {analytics.topBusinesses.map((biz, idx) => (
-                          <li key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ background: 'white', padding: '1.5rem', borderRadius: 'var(--radius-lg)', border: '1px solid #E5E7EB' }}>
+                    <h3 style={{ marginBottom: '1.25rem', fontSize: '1rem' }}>Top Businesses</h3>
+                    {(analytics.topBusinesses || []).length === 0 ? <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>None yet.</p> : (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                        {analytics.topBusinesses.map((b, i) => (
+                          <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                              <div style={{ width: '24px', height: '24px', background: 'var(--accent)', color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 800 }}>{idx + 1}</div>
-                              <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>{biz.name}</span>
+                              <div style={{ width: '22px', height: '22px', background: 'var(--accent)', color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: 800, flexShrink: 0 }}>{i + 1}</div>
+                              <span style={{ fontSize: '0.875rem', fontWeight: 600 }}>{b.name}</span>
                             </div>
-                            <span style={{ fontWeight: 700, color: '#10B981', fontSize: '0.9rem' }}>₦{biz.revenue.toLocaleString()}</span>
-                          </li>
+                            <span style={{ fontWeight: 700, color: '#10B981', fontSize: '0.875rem', whiteSpace: 'nowrap' }}>₦{b.revenue?.toLocaleString()}</span>
+                          </div>
                         ))}
-                      </ul>
+                      </div>
                     )}
                   </div>
                 </div>
-
               </div>
             )}
           </div>
         )}
 
-        {activeView === 'overview' && (
-          <div className="animate-fade">
-            {/* Stats Cards */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '2rem', marginBottom: '3rem' }}>
-              <div className="glass" style={{ padding: '2rem', borderRadius: 'var(--radius-lg)', textAlign: 'center' }}>
-                <div style={{ background: 'var(--accent)', color: 'white', width: '60px', height: '60px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem' }}>
-                  <Package size={24} />
-                </div>
-                <h3 style={{ fontSize: '2rem', margin: '0 0 0.5rem', color: 'var(--accent)' }}>{stats.totalOrders}</h3>
-                <p style={{ color: 'var(--text-muted)', margin: 0 }}>Total Orders</p>
-              </div>
-
-              <div className="glass" style={{ padding: '2rem', borderRadius: 'var(--radius-lg)', textAlign: 'center' }}>
-                <div style={{ background: '#10B981', color: 'white', width: '60px', height: '60px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem' }}>
-                  <TrendingUp size={24} />
-                </div>
-                <h3 style={{ fontSize: '2rem', margin: '0 0 0.5rem', color: '#10B981' }}>₦{stats.totalRevenue.toLocaleString()}</h3>
-                <p style={{ color: 'var(--text-muted)', margin: 0 }}>Total Revenue</p>
-              </div>
-
-              <div className="glass" style={{ padding: '2rem', borderRadius: 'var(--radius-lg)', textAlign: 'center' }}>
-                <div style={{ background: '#F59E0B', color: 'white', width: '60px', height: '60px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem' }}>
-                  <Users size={24} />
-                </div>
-                <h3 style={{ fontSize: '2rem', margin: '0 0 0.5rem', color: '#F59E0B' }}>{stats.totalCustomers}</h3>
-                <p style={{ color: 'var(--text-muted)', margin: 0 }}>Unique Customers</p>
-              </div>
-
-              <div className="glass" style={{ padding: '2rem', borderRadius: 'var(--radius-lg)', textAlign: 'center' }}>
-                <div style={{ background: '#8B5CF6', color: 'white', width: '60px', height: '60px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem' }}>
-                  <Package size={24} />
-                </div>
-                <h3 style={{ fontSize: '2rem', margin: '0 0 0.5rem', color: '#8B5CF6' }}>{stats.totalProducts}</h3>
-                <p style={{ color: 'var(--text-muted)', margin: 0 }}>Products Sold</p>
-              </div>
-            </div>
-
-            {/* Orders Table */}
-            <div className="glass" style={{ padding: '2rem', borderRadius: 'var(--radius-lg)' }}>
-              <h2 style={{ marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <Calendar size={24} /> Recent Orders
-              </h2>
-
-              {orders.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>
-                  <Package size={48} style={{ margin: '0 auto 1rem', opacity: 0.5 }} />
-                  <p>No orders yet. Start promoting your store!</p>
-                </div>
-              ) : (
-                <div style={{ overflowX: 'auto' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                    <thead>
-                      <tr style={{ borderBottom: '2px solid #E5E7EB' }}>
-                        <th style={{ padding: '1rem', textAlign: 'left', fontWeight: 700 }}>Order ID</th>
-                        <th style={{ padding: '1rem', textAlign: 'left', fontWeight: 700 }}>Customer</th>
-                        <th style={{ padding: '1rem', textAlign: 'left', fontWeight: 700 }}>Items</th>
-                        <th style={{ padding: '1rem', textAlign: 'left', fontWeight: 700 }}>Total</th>
-                        <th style={{ padding: '1rem', textAlign: 'left', fontWeight: 700 }}>Date</th>
-                        <th style={{ padding: '1rem', textAlign: 'left', fontWeight: 700 }}>Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {orders.map((order) => (
-                        <tr key={order.id} style={{ borderBottom: '1px solid #F3F4F6' }}>
-                          <td style={{ padding: '1rem', fontFamily: 'monospace', fontSize: '0.875rem' }}>
-                            {order.id}
-                          </td>
-                          <td style={{ padding: '1rem' }}>
-                            <div>
-                              <div style={{ fontWeight: 600 }}>{order.customer_name}</div>
-                              <div style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>{order.customer_email}</div>
-                              <div style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>{order.customer_phone}</div>
-                            </div>
-                          </td>
-                          <td style={{ padding: '1rem' }}>
-                            <div style={{ fontSize: '0.875rem' }}>
-                              {order.items.map((item, idx) => (
-                                <div key={idx} style={{ marginBottom: '0.25rem' }}>
-                                  {item.quantity}x {item.name}
-                                </div>
-                              ))}
-                            </div>
-                          </td>
-                          <td style={{ padding: '1rem', fontWeight: 700, color: 'var(--accent)' }}>
-                            ₦{order.total_amount.toLocaleString()}
-                          </td>
-                          <td style={{ padding: '1rem', fontSize: '0.875rem' }}>
-                            {formatDate(order.created_at)}
-                          </td>
-                          <td style={{ padding: '1rem' }}>
-                            <span style={{
-                              padding: '0.25rem 0.75rem',
-                              borderRadius: 'var(--radius-full)',
-                              fontSize: '0.75rem',
-                              fontWeight: 600,
-                              background: order.status === 'completed' ? '#ECFDF5' : '#FEF2F2',
-                              color: order.status === 'completed' ? '#10B981' : '#EF4444'
-                            }}>
-                              {order.status.toUpperCase()}
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
+        {/* ── USERS ── */}
         {activeView === 'users' && (
           <div className="animate-fade">
-            <h2 style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Users size={24} /> Platform Users ({users.length})
-            </h2>
-            <div className="glass" style={{ borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                <thead style={{ background: '#F9FAFB' }}>
-                  <tr>
-                    <th style={{ padding: '1.25rem', textAlign: 'left', fontWeight: 700 }}>User Info</th>
-                    <th style={{ padding: '1.25rem', textAlign: 'left', fontWeight: 700 }}>Role</th>
-                    <th style={{ padding: '1.25rem', textAlign: 'left', fontWeight: 700 }}>Joined</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {users.map(u => (
-                    <tr key={u.email} style={{ borderBottom: '1px solid #F3F4F6' }}>
-                      <td style={{ padding: '1rem' }}>
-                        <div style={{ fontWeight: 600 }}>{u.full_name}</div>
-                        <div style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>{u.email}</div>
-                      </td>
-                      <td style={{ padding: '1rem' }}>
-                        <span style={{
-                          padding: '0.25rem 0.75rem',
-                          borderRadius: 'var(--radius-full)',
-                          fontSize: '0.75rem',
-                          fontWeight: 600,
-                          background: u.is_admin ? '#EEF2FF' : '#F3F4F6',
-                          color: u.is_admin ? '#4F46E5' : '#6B7280'
-                        }}>
-                          {u.is_admin ? 'Admin' : 'Merchant'}
-                        </span>
-                      </td>
-                      <td style={{ padding: '1rem', fontSize: '0.875rem', color: 'var(--text-muted)' }}>
-                        {u.created_at ? formatDate(u.created_at) : 'N/A'}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <h2 style={{ marginBottom: '1.25rem', fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Users size={18} /> Users ({users.length})</h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              {users.map(u => (
+                <div key={u.email} style={{ background: 'white', padding: '1rem 1.25rem', borderRadius: 'var(--radius-lg)', border: '1px solid #E5E7EB', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
+                  <div>
+                    <div style={{ fontWeight: 700, fontSize: '0.95rem' }}>{u.full_name}</div>
+                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{u.email}</div>
+                    <div style={{ fontSize: '0.75rem', color: '#94A3B8', marginTop: '0.2rem' }}>{formatDate(u.created_at)}</div>
+                  </div>
+                  <span style={{ padding: '0.25rem 0.75rem', borderRadius: 'var(--radius-full)', fontSize: '0.75rem', fontWeight: 700, background: u.is_admin ? '#EEF2FF' : u.is_merchant ? '#F0FDF4' : '#F3F4F6', color: u.is_admin ? '#4F46E5' : u.is_merchant ? '#16A34A' : '#6B7280', whiteSpace: 'nowrap' }}>
+                    {u.is_admin ? 'Admin' : u.is_merchant ? 'Merchant' : 'Customer'}
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
         )}
 
+        {/* ── BUSINESSES ── */}
         {activeView === 'businesses' && (
           <div className="animate-fade">
-            <h2 style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Store size={24} /> Managed Businesses ({businesses.length})
-            </h2>
-            <div className="glass" style={{ borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                <thead style={{ background: '#F9FAFB' }}>
-                  <tr>
-                    <th style={{ padding: '1.25rem', textAlign: 'left', fontWeight: 700 }}>Business</th>
-                    <th style={{ padding: '1.25rem', textAlign: 'left', fontWeight: 700 }}>Owner</th>
-                    <th style={{ padding: '1.25rem', textAlign: 'left', fontWeight: 700 }}>Category</th>
-                    <th style={{ padding: '1.25rem', textAlign: 'center', fontWeight: 700 }}>Status</th>
-                    <th style={{ padding: '1.25rem', textAlign: 'right', fontWeight: 700 }}>Products</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {businesses.map(b => (
-                    <tr key={b.id} style={{ borderBottom: '1px solid #F3F4F6' }}>
-                      <td style={{ padding: '1rem' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                          <img src={b.logo} alt="" style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover', background: '#e2e8f0' }} />
-                          <div style={{ fontWeight: 600 }}>{b.name}</div>
-                        </div>
-                      </td>
-                      <td style={{ padding: '1rem', fontSize: '0.875rem' }}>{b.owner_email || 'Unassigned'}</td>
-                      <td style={{ padding: '1rem', fontSize: '0.875rem' }}>{b.category}</td>
-                      <td style={{ padding: '1rem', textAlign: 'center' }}>
-                        {b.is_approved !== false ? (
-                          <span style={{ padding: '0.25rem 0.5rem', borderRadius: '9999px', fontSize: '0.75rem', fontWeight: 600, background: '#DCFCE7', color: '#166534' }}>Approved</span>
-                        ) : (
-                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
-                            <span style={{ padding: '0.25rem 0.5rem', borderRadius: '9999px', fontSize: '0.75rem', fontWeight: 600, background: '#FEF9C3', color: '#854D0E' }}>Pending</span>
-                            <button onClick={() => handleApprove(b.id)} className="btn btn-primary" style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem' }}>Approve</button>
-                          </div>
-                        )}
-                      </td>
-                      <td style={{ padding: '1rem', textAlign: 'right', fontWeight: 600 }}>{b.products?.length || 0}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <h2 style={{ marginBottom: '1.25rem', fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Store size={18} /> Businesses ({businesses.length})</h2>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 320px), 1fr))', gap: '1rem' }}>
+              {businesses.map(b => (
+                <div key={b.id || b._id} style={{ background: 'white', borderRadius: 'var(--radius-lg)', border: '1px solid #E5E7EB', overflow: 'hidden' }}>
+                  <div style={{ height: '100px', overflow: 'hidden' }}>
+                    <img src={b.hero_image || 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&q=80&w=400'} alt={b.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  </div>
+                  <div style={{ padding: '1rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
+                      <div>
+                        <div style={{ fontWeight: 700, fontSize: '0.95rem' }}>{b.name}</div>
+                        <div style={{ fontSize: '0.75rem', color: 'var(--accent)', fontWeight: 600 }}>{b.category}</div>
+                      </div>
+                      {b.is_approved !== false ? (
+                        <span style={{ padding: '0.2rem 0.6rem', borderRadius: 'var(--radius-full)', fontSize: '0.7rem', fontWeight: 700, background: '#DCFCE7', color: '#166534', whiteSpace: 'nowrap' }}>Approved</span>
+                      ) : (
+                        <button onClick={() => handleApprove(b.id || b._id)} className="btn btn-primary" style={{ padding: '0.3rem 0.75rem', fontSize: '0.75rem' }}>Approve</button>
+                      )}
+                    </div>
+                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                      {b.owner_email ? <span>Owner: {b.owner_email}</span> : <span style={{ opacity: 0.5 }}>No owner assigned</span>}
+                    </div>
+                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>{b.products?.length || 0} products</div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         )}
       </div>
+
+      <style>{`
+        @media (max-width: 640px) {
+          .admin-table-desktop { display: none !important; }
+          .admin-cards-mobile { display: flex !important; }
+        }
+      `}</style>
     </div>
   );
 }

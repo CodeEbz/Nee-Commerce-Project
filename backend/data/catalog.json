@@ -4,39 +4,18 @@
     "name": "Apinke Herbs",
     "slug": "apinke-herbs",
     "category": "Wellness",
-    "description": "Premium herbal teas and natural remedies for your wellness journey. We specialize in organic, locally-sourced herbs that promote holistic health and vitality.",
+    "description": "Premium herbal teas and natural remedies for your wellness journey. Organic, locally-sourced herbs that promote holistic health and vitality.",
     "whatsapp_link": "https://wa.me/c/2348027550551",
-    "hero_image": "https://images.unsplash.com/photo-1642698817356-52d9d3c9d1fa?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    "logo": "https://media.istockphoto.com/id/2168276338/photo/linden-flower-tea-in-a-glass-cup.webp?a=1&b=1&s=612x612&w=0&k=20&c=AY5zQHUg7zf80Yu3l8RLt-25_ed04Sg92GOhhnJmwmI=",
+    "hero_image": "https://images.unsplash.com/photo-1542736705-53f0131d1e98?auto=format&fit=crop&q=80&w=1200",
+    "logo": "https://images.unsplash.com/photo-1564890369478-c89ca6d9cde9?auto=format&fit=crop&q=80&w=200",
     "featured": true,
     "products": [
-      {
-        "code": "HERB001",
-        "whatsapp_id": "8934756201",
-        "name": "Slim Tea Detox",
-        "price": 5000,
-        "description": "A 14-day detox tea blend to help cleanse your system naturally with premium organic herbs.",
-        "image": "https://images.unsplash.com/photo-1642698817356-52d9d3c9d1fa?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-        "featured": true
-      },
-      {
-        "code": "HERB005",
-        "whatsapp_id": "24652722924356336",
-        "name": "Sunflower Seeds",
-        "price": 3000,
-        "description": "100g black Sunflower Seeds",
-        "image": "https://media.istockphoto.com/id/2063763551/photo/mixture-of-roasted-sunflower-and-pumpkin-seeds-in-a-wooden-bowl.webp?a=1&b=1&s=612x612&w=0&k=20&c=yPBAYvtJGyDN6ApGvt1bdKxBRZGpLcVUvlIDwuDAGKM=",
-        "featured": true
-      },
-      {
-        "code": "HERB004",
-        "whatsapp_id": "8934756204",
-        "name": "Turmeric Ginger Blend",
-        "price": 4500,
-        "description": "Anti-inflammatory herbal blend perfect for daily wellness routine.",
-        "image": "https://images.unsplash.com/photo-1682530016992-d8a2f30b6dd6?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-        "featured": false
-      }
+      { "code": "HERB001", "whatsapp_id": "8934756201", "name": "Slim Tea Detox", "price": 5000, "description": "14-day detox tea blend to cleanse your system naturally.", "image": "https://images.unsplash.com/photo-1597318181409-cf64d0b5d8a5?auto=format&fit=crop&q=80&w=800", "featured": true },
+      { "code": "HERB005", "whatsapp_id": "24652722924356336", "name": "Sunflower Seeds", "price": 3000, "description": "100g roasted black sunflower seeds, rich in nutrients.", "image": "https://images.unsplash.com/photo-1571070501878-a9a7738d0dc6?auto=format&fit=crop&q=80&w=800", "featured": true },
+      { "code": "HERB004", "whatsapp_id": "8934756204", "name": "Turmeric Ginger Blend", "price": 4500, "description": "Anti-inflammatory herbal blend for daily wellness.", "image": "https://images.unsplash.com/photo-1615485500704-8e990f9900f7?auto=format&fit=crop&q=80&w=800", "featured": true },
+      { "code": "HERB006", "whatsapp_id": "8934756206", "name": "Natural Honey (500g)", "price": 6000, "description": "Pure organic honey, raw and unfiltered from local beekeepers.", "image": "https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&q=80&w=800", "featured": true },
+      { "code": "HERB007", "whatsapp_id": "8934756207", "name": "Moringa Leaf Powder", "price": 3500, "description": "100% pure moringa leaf powder, packed with vitamins and minerals.", "image": "https://images.unsplash.com/photo-1610725664285-7c57e6eeac3f?auto=format&fit=crop&q=80&w=800", "featured": false },
+      { "code": "HERB008", "whatsapp_id": "8934756208", "name": "Hibiscus Zobo Tea", "price": 2500, "description": "Dried hibiscus flowers for a rich, antioxidant-packed zobo drink.", "image": "https://images.unsplash.com/photo-1563822249366-3efb23b8e0c9?auto=format&fit=crop&q=80&w=800", "featured": false }
     ]
   },
   {
@@ -44,30 +23,18 @@
     "name": "Luxe Hair Studio",
     "slug": "luxe-hair",
     "category": "Beauty",
-    "description": "High-quality human hair extensions, wigs, and premium hair care products for the modern woman. Transform your look with our luxury collection.",
+    "description": "High-quality human hair extensions, wigs, and premium hair care products for the modern woman.",
     "whatsapp_link": "https://wa.me/c/2347000000000",
     "hero_image": "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&q=80&w=1200",
-    "logo": "https://images.unsplash.com/photo-1560264641-1b5191cc63e2?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8aGFpcnxlbnwwfHwwfHx8MA%3D%3D",
+    "logo": "https://images.unsplash.com/photo-1560264641-1b5191cc63e2?auto=format&fit=crop&q=80&w=200",
     "featured": true,
     "products": [
-      {
-        "code": "HAIR001",
-        "whatsapp_id": "9928374650",
-        "name": "Bone Straight Wig",
-        "price": 85000,
-        "description": "Premium 20-inch bone straight human hair wig. Sleek, natural, and durable for everyday glamour.",
-        "image": "https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?auto=format&fit=crop&q=80&w=800",
-        "featured": true
-      },
-      {
-        "code": "HAIR002",
-        "whatsapp_id": "9928374651",
-        "name": "Curly Lace Front Wig",
-        "price": 95000,
-        "description": "Natural curly lace front wig with baby hairs for a seamless look.",
-        "image": "https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?auto=format&fit=crop&q=80&w=800",
-        "featured": true
-      }
+      { "code": "HAIR001", "whatsapp_id": "9928374650", "name": "Bone Straight Wig 20\"", "price": 85000, "description": "Premium 20-inch bone straight human hair wig, sleek and natural.", "image": "https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?auto=format&fit=crop&q=80&w=800", "featured": true },
+      { "code": "HAIR002", "whatsapp_id": "9928374651", "name": "Curly Lace Front Wig", "price": 95000, "description": "Natural curly lace front wig with baby hairs for a seamless look.", "image": "https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?auto=format&fit=crop&q=80&w=800", "featured": true },
+      { "code": "HAIR003", "whatsapp_id": "9928374652", "name": "Body Wave Closure Wig", "price": 78000, "description": "Beautiful body wave wig with 4x4 lace closure, 18 inches.", "image": "https://images.unsplash.com/photo-1522338242992-e1a54906a8da?auto=format&fit=crop&q=80&w=800", "featured": true },
+      { "code": "HAIR004", "whatsapp_id": "9928374653", "name": "Kinky Afro Wig", "price": 55000, "description": "Natural kinky afro wig, full and voluminous for a bold look.", "image": "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&q=80&w=800", "featured": false },
+      { "code": "HAIR005", "whatsapp_id": "9928374654", "name": "Hair Growth Serum", "price": 8500, "description": "Professional hair growth and strengthening serum with natural oils.", "image": "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&q=80&w=800", "featured": true },
+      { "code": "HAIR006", "whatsapp_id": "9928374655", "name": "Deep Conditioner Pack", "price": 4500, "description": "Intensive moisture deep conditioner for dry and damaged hair.", "image": "https://images.unsplash.com/photo-1526045612212-70caf35c14df?auto=format&fit=crop&q=80&w=800", "featured": false }
     ]
   },
   {
@@ -75,39 +42,18 @@
     "name": "Urban Fashion Hub",
     "slug": "urban-fashion",
     "category": "Fashion",
-    "description": "Stay ahead of the trends with our curated collection of affordable and stylish streetwear. Express your unique style with confidence.",
+    "description": "Curated collection of affordable and stylish streetwear. Express your unique style with confidence.",
     "whatsapp_link": "https://wa.me/c/2347012345678",
-    "hero_image": "https://images.unsplash.com/photo-1540221652346-e5dd6b50f3e7?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Y2xvdGhlc3xlbnwwfHwwfHx8MA%3D%3D",
-    "logo": "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTh8fGNsb3RoZXN8ZW58MHx8MHx8fDA%3D",
+    "hero_image": "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&q=80&w=1200",
+    "logo": "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&q=80&w=200",
     "featured": true,
     "products": [
-      {
-        "code": "FASH001",
-        "whatsapp_id": "1122334455",
-        "name": "Premium Oversized Tee",
-        "price": 7500,
-        "description": "Soft cotton oversized t-shirt in vintage wash black. Perfect for casual streetwear looks.",
-        "image": "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&q=80&w=800",
-        "featured": true
-      },
-      {
-        "code": "FASH002",
-        "whatsapp_id": "1122334456",
-        "name": "Classic Denim Jacket",
-        "price": 15000,
-        "description": "Timeless denim jacket with a modern fit. A wardrobe essential for any season.",
-        "image": "https://images.unsplash.com/photo-1543076447-215ad9ba6923?auto=format&fit=crop&q=80&w=800",
-        "featured": false
-      },
-      {
-        "code": "FASH003",
-        "whatsapp_id": "1122334457",
-        "name": "Designer Sneakers",
-        "price": 25000,
-        "description": "Limited edition designer sneakers with premium materials and comfort.",
-        "image": "https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&q=80&w=800",
-        "featured": true
-      }
+      { "code": "FASH001", "whatsapp_id": "1122334455", "name": "Premium Oversized Tee", "price": 7500, "description": "Soft cotton oversized t-shirt in vintage wash black.", "image": "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&q=80&w=800", "featured": true },
+      { "code": "FASH002", "whatsapp_id": "1122334456", "name": "Classic Denim Jacket", "price": 15000, "description": "Timeless denim jacket with a modern fit.", "image": "https://images.unsplash.com/photo-1543076447-215ad9ba6923?auto=format&fit=crop&q=80&w=800", "featured": true },
+      { "code": "FASH003", "whatsapp_id": "1122334457", "name": "Designer Sneakers", "price": 25000, "description": "Limited edition designer sneakers with premium materials.", "image": "https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&q=80&w=800", "featured": true },
+      { "code": "FASH004", "whatsapp_id": "1122334458", "name": "Cargo Jogger Pants", "price": 12000, "description": "Comfortable cargo jogger pants with multiple pockets.", "image": "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&q=80&w=800", "featured": false },
+      { "code": "FASH005", "whatsapp_id": "1122334459", "name": "Graphic Hoodie", "price": 18000, "description": "Heavy cotton graphic hoodie with premium print quality.", "image": "https://images.unsplash.com/photo-1556821840-3a63f15732ce?auto=format&fit=crop&q=80&w=800", "featured": true },
+      { "code": "FASH006", "whatsapp_id": "1122334460", "name": "Bucket Hat", "price": 5500, "description": "Trendy bucket hat available in multiple colours.", "image": "https://images.unsplash.com/photo-1521369909029-2afed882baee?auto=format&fit=crop&q=80&w=800", "featured": false }
     ]
   },
   {
@@ -115,30 +61,18 @@
     "name": "Fresh Mart Organics",
     "slug": "fresh-mart",
     "category": "Groceries",
-    "description": "Fresh farm produce delivered to your door. Supporting local farmers while bringing you the finest organic fruits and vegetables.",
+    "description": "Fresh farm produce delivered to your door. Supporting local farmers with the finest organic fruits and vegetables.",
     "whatsapp_link": "https://wa.me/c/2349012345678",
     "hero_image": "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=1200",
-    "logo": "https://plus.unsplash.com/premium_photo-1671379041175-782d15092945?q=80&w=420&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    "featured": false,
+    "logo": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&q=80&w=200",
+    "featured": true,
     "products": [
-      {
-        "code": "GROC001",
-        "whatsapp_id": "7721948563",
-        "name": "Organic Tomato Basket",
-        "price": 4500,
-        "description": "Fresh, sun-ripened organic tomatoes grown without pesticides.",
-        "image": "https://images.unsplash.com/photo-1629398781480-8ffcf5b213a4?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MzB8fHRvbWF0b2VzJTIwYmFza2V0fGVufDB8fDB8fHww",
-        "featured": false
-      },
-      {
-        "code": "GROC002",
-        "whatsapp_id": "7721948564",
-        "name": "Mixed Vegetable Box",
-        "price": 8500,
-        "description": "Weekly selection of fresh seasonal vegetables from local farms.",
-        "image": "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&q=80&w=800",
-        "featured": true
-      }
+      { "code": "GROC001", "whatsapp_id": "7721948563", "name": "Organic Tomato Basket", "price": 4500, "description": "Fresh, sun-ripened organic tomatoes grown without pesticides.", "image": "https://images.unsplash.com/photo-1518977676601-b53f02ac6d31?auto=format&fit=crop&q=80&w=800", "featured": true },
+      { "code": "GROC002", "whatsapp_id": "7721948564", "name": "Mixed Vegetable Box", "price": 8500, "description": "Weekly selection of fresh seasonal vegetables from local farms.", "image": "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&q=80&w=800", "featured": true },
+      { "code": "GROC003", "whatsapp_id": "7721948565", "name": "Assorted Fresh Fruits", "price": 6500, "description": "Seasonal mixed fruit basket including mangoes, pawpaw and bananas.", "image": "https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?auto=format&fit=crop&q=80&w=800", "featured": true },
+      { "code": "GROC004", "whatsapp_id": "7721948566", "name": "Farm Fresh Eggs (Crate)", "price": 5800, "description": "30 pieces of fresh, farm-direct brown eggs.", "image": "https://images.unsplash.com/photo-1569127959161-2b1297b2d9a6?auto=format&fit=crop&q=80&w=800", "featured": false },
+      { "code": "GROC005", "whatsapp_id": "7721948567", "name": "Red Palm Oil (1 litre)", "price": 3200, "description": "Pure unrefined red palm oil, freshly pressed.", "image": "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&q=80&w=800", "featured": false },
+      { "code": "GROC006", "whatsapp_id": "7721948568", "name": "Plantain Bunch", "price": 2800, "description": "Ripe and unripe plantain bunches, farm fresh.", "image": "https://images.unsplash.com/photo-1603833665858-e61d17a86224?auto=format&fit=crop&q=80&w=800", "featured": false }
     ]
   },
   {
@@ -147,29 +81,17 @@
     "slug": "iron-temple",
     "category": "Fitness",
     "description": "Premium fitness equipment and workout gear for the dedicated athlete. Build your home gym with professional-grade equipment.",
-    "whatsapp_link": "https://wa.me/c/234800GYMSHOP",
+    "whatsapp_link": "https://wa.me/c/2348009496763",
     "hero_image": "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=80&w=1200",
-    "logo": "https://images.unsplash.com/photo-1547919307-1ecb10702e6f?q=80&w=1376&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "logo": "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&q=80&w=200",
     "featured": true,
     "products": [
-      {
-        "code": "GYM001",
-        "whatsapp_id": "4433221100",
-        "name": "Adjustable Dumbbells",
-        "price": 45000,
-        "description": "Pro-grade adjustable dumbbells, up to 24kg each. Perfect for home workouts.",
-        "image": "https://images.unsplash.com/photo-1583454110551-21f2fa20019b?auto=format&fit=crop&q=80&w=800",
-        "featured": true
-      },
-      {
-        "code": "GYM002",
-        "whatsapp_id": "4433221101",
-        "name": "Resistance Band Set",
-        "price": 12000,
-        "description": "Complete resistance band set with multiple resistance levels and accessories.",
-        "image": "https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?auto=format&fit=crop&q=80&w=800",
-        "featured": true
-      }
+      { "code": "GYM001", "whatsapp_id": "4433221100", "name": "Adjustable Dumbbells Set", "price": 45000, "description": "Pro-grade adjustable dumbbells up to 24kg each.", "image": "https://images.unsplash.com/photo-1583454110551-21f2fa20019b?auto=format&fit=crop&q=80&w=800", "featured": true },
+      { "code": "GYM002", "whatsapp_id": "4433221101", "name": "Resistance Band Set", "price": 12000, "description": "Complete resistance band set with 5 resistance levels.", "image": "https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?auto=format&fit=crop&q=80&w=800", "featured": true },
+      { "code": "GYM003", "whatsapp_id": "4433221102", "name": "Yoga Mat Premium", "price": 9500, "description": "6mm thick non-slip yoga mat with alignment lines.", "image": "https://images.unsplash.com/photo-1601925228952-a29f2e9fa9a0?auto=format&fit=crop&q=80&w=800", "featured": true },
+      { "code": "GYM004", "whatsapp_id": "4433221103", "name": "Jump Rope Speed", "price": 4500, "description": "Professional speed jump rope with ball bearings for smooth rotation.", "image": "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&q=80&w=800", "featured": false },
+      { "code": "GYM005", "whatsapp_id": "4433221104", "name": "Pull-Up Bar (Doorway)", "price": 18000, "description": "Heavy-duty doorway pull-up bar, no installation needed.", "image": "https://images.unsplash.com/photo-1517963879433-6ad2b056d712?auto=format&fit=crop&q=80&w=800", "featured": true },
+      { "code": "GYM006", "whatsapp_id": "4433221105", "name": "Protein Shaker Bottle", "price": 3500, "description": "BPA-free 700ml protein shaker with mixing ball.", "image": "https://images.unsplash.com/photo-1593095948071-474c5cc2989d?auto=format&fit=crop&q=80&w=800", "featured": false }
     ]
   },
   {
@@ -177,30 +99,96 @@
     "name": "TechHub Electronics",
     "slug": "techhub-electronics",
     "category": "Electronics",
-    "description": "Latest gadgets and electronics at competitive prices. From smartphones to smart home devices, we have it all.",
+    "description": "Latest gadgets and electronics at competitive prices. Phones, laptops, accessories and smart home devices.",
     "whatsapp_link": "https://wa.me/c/2348123456789",
     "hero_image": "https://images.unsplash.com/photo-1498049794561-7780e7231661?auto=format&fit=crop&q=80&w=1200",
-    "logo": "https://images.unsplash.com/photo-1550009158-9ebf69173e03?q=80&w=1501&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "logo": "https://images.unsplash.com/photo-1550009158-9ebf69173e03?auto=format&fit=crop&q=80&w=200",
     "featured": true,
     "products": [
-      {
-        "code": "TECH001",
-        "whatsapp_id": "5544332211",
-        "name": "Wireless Earbuds Pro",
-        "price": 35000,
-        "description": "Premium wireless earbuds with noise cancellation and 24-hour battery life.",
-        "image": "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?auto=format&fit=crop&q=80&w=800",
-        "featured": true
-      },
-      {
-        "code": "TECH002",
-        "whatsapp_id": "5544332212",
-        "name": "Smart Watch Series X",
-        "price": 75000,
-        "description": "Advanced smartwatch with health monitoring and GPS tracking.",
-        "image": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=80&w=800",
-        "featured": true
-      }
+      { "code": "TECH001", "whatsapp_id": "5544332211", "name": "Wireless Earbuds Pro", "price": 35000, "description": "Premium TWS earbuds with ANC and 24-hour battery life.", "image": "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?auto=format&fit=crop&q=80&w=800", "featured": true },
+      { "code": "TECH002", "whatsapp_id": "5544332212", "name": "Smart Watch Series X", "price": 75000, "description": "Advanced smartwatch with health monitoring, GPS and AMOLED display.", "image": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=80&w=800", "featured": true },
+      { "code": "TECH003", "whatsapp_id": "5544332213", "name": "iPhone 15 Pro (Used)", "price": 650000, "description": "Grade A iPhone 15 Pro 256GB, excellent condition with box.", "image": "https://images.unsplash.com/photo-1696426301726-4e2e8194c0c0?auto=format&fit=crop&q=80&w=800", "featured": true },
+      { "code": "TECH004", "whatsapp_id": "5544332214", "name": "Samsung Galaxy S24", "price": 580000, "description": "Samsung Galaxy S24 256GB, sealed in box, all colours available.", "image": "https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?auto=format&fit=crop&q=80&w=800", "featured": true },
+      { "code": "TECH005", "whatsapp_id": "5544332215", "name": "MacBook Air M2", "price": 1200000, "description": "Apple MacBook Air M2 chip, 8GB RAM, 256GB SSD, Space Grey.", "image": "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&q=80&w=800", "featured": true },
+      { "code": "TECH006", "whatsapp_id": "5544332216", "name": "HP Laptop 15 Core i5", "price": 420000, "description": "HP 15-inch laptop, Intel Core i5, 8GB RAM, 512GB SSD, Windows 11.", "image": "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&q=80&w=800", "featured": false },
+      { "code": "TECH007", "whatsapp_id": "5544332217", "name": "Bluetooth Speaker JBL", "price": 28000, "description": "JBL Charge 5 waterproof portable Bluetooth speaker, 20hr battery.", "image": "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?auto=format&fit=crop&q=80&w=800", "featured": false },
+      { "code": "TECH008", "whatsapp_id": "5544332218", "name": "Power Bank 20000mAh", "price": 18000, "description": "65W fast charging power bank with dual USB-C and USB-A ports.", "image": "https://images.unsplash.com/photo-1609592806596-4533e3d555b3?auto=format&fit=crop&q=80&w=800", "featured": false }
+    ]
+  },
+  {
+    "id": "biz_007",
+    "name": "Glam Beauty Store",
+    "slug": "glam-beauty",
+    "category": "Beauty",
+    "description": "Your one-stop shop for premium skincare, makeup, and beauty products. Glow up with our curated collection of top beauty brands.",
+    "whatsapp_link": "https://wa.me/c/2348055678901",
+    "hero_image": "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&q=80&w=1200",
+    "logo": "https://images.unsplash.com/photo-1631214524020-3c69f4e7ef4c?auto=format&fit=crop&q=80&w=200",
+    "featured": true,
+    "products": [
+      { "code": "GLAM001", "whatsapp_id": "6655443321", "name": "Vitamin C Brightening Serum", "price": 12500, "description": "20% Vitamin C serum that fades dark spots and evens skin tone.", "image": "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&q=80&w=800", "featured": true },
+      { "code": "GLAM002", "whatsapp_id": "6655443322", "name": "Matte Lipstick Collection", "price": 4500, "description": "Long-lasting matte lipstick in 12 stunning shades.", "image": "https://images.unsplash.com/photo-1586495777744-4e6232bf4b05?auto=format&fit=crop&q=80&w=800", "featured": true },
+      { "code": "GLAM003", "whatsapp_id": "6655443323", "name": "SPF 50 Sunscreen Lotion", "price": 8000, "description": "Lightweight SPF 50 sunscreen lotion, non-greasy formula.", "image": "https://images.unsplash.com/photo-1556228578-8c89e6adf883?auto=format&fit=crop&q=80&w=800", "featured": true },
+      { "code": "GLAM004", "whatsapp_id": "6655443324", "name": "Makeup Brush Set (12pc)", "price": 7500, "description": "Professional 12-piece makeup brush set with carrying case.", "image": "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&q=80&w=800", "featured": false },
+      { "code": "GLAM005", "whatsapp_id": "6655443325", "name": "Hyaluronic Acid Moisturiser", "price": 9800, "description": "Ultra-hydrating moisturiser with hyaluronic acid and niacinamide.", "image": "https://images.unsplash.com/photo-1611080541599-8c6dbde6ed28?auto=format&fit=crop&q=80&w=800", "featured": true },
+      { "code": "GLAM006", "whatsapp_id": "6655443326", "name": "Eyeshadow Palette 24 Shades", "price": 11000, "description": "Pigmented 24-shade eyeshadow palette, matte and shimmer finish.", "image": "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&q=80&w=800", "featured": false }
+    ]
+  },
+  {
+    "id": "biz_008",
+    "name": "Naija Kicks & Bags",
+    "slug": "naija-kicks",
+    "category": "Fashion",
+    "description": "Premium shoes, sneakers, and designer bags for men and women. Authentic quality at the best prices in Lagos.",
+    "whatsapp_link": "https://wa.me/c/2348067891234",
+    "hero_image": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&q=80&w=1200",
+    "logo": "https://images.unsplash.com/photo-1491553895911-0055eca6402d?auto=format&fit=crop&q=80&w=200",
+    "featured": true,
+    "products": [
+      { "code": "KICK001", "whatsapp_id": "7766554431", "name": "Nike Air Force 1 '07", "price": 65000, "description": "Classic Nike Air Force 1 in white, sizes 38–46 available.", "image": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&q=80&w=800", "featured": true },
+      { "code": "KICK002", "whatsapp_id": "7766554432", "name": "Adidas Samba OG", "price": 72000, "description": "Iconic Adidas Samba OG in black/white, premium leather upper.", "image": "https://images.unsplash.com/photo-1608231387042-66d1773070a5?auto=format&fit=crop&q=80&w=800", "featured": true },
+      { "code": "KICK003", "whatsapp_id": "7766554433", "name": "Ladies Tote Bag", "price": 22000, "description": "Premium PU leather tote bag, spacious with inner pockets.", "image": "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&q=80&w=800", "featured": true },
+      { "code": "KICK004", "whatsapp_id": "7766554434", "name": "Men's Chelsea Boots", "price": 38000, "description": "Genuine leather Chelsea boots, sleek and durable.", "image": "https://images.unsplash.com/photo-1638247025967-b4e38f787b76?auto=format&fit=crop&q=80&w=800", "featured": false },
+      { "code": "KICK005", "whatsapp_id": "7766554435", "name": "Mini Crossbody Bag", "price": 15000, "description": "Trendy mini crossbody bag in multiple colours.", "image": "https://images.unsplash.com/photo-1614179689702-355944cd0918?auto=format&fit=crop&q=80&w=800", "featured": true },
+      { "code": "KICK006", "whatsapp_id": "7766554436", "name": "Jordan 4 Retro (Replica)", "price": 45000, "description": "High-quality Jordan 4 replica, multiple colourways available.", "image": "https://images.unsplash.com/photo-1556048219-bb6978360b84?auto=format&fit=crop&q=80&w=800", "featured": false }
+    ]
+  },
+  {
+    "id": "biz_009",
+    "name": "Casa Home Decor",
+    "slug": "casa-home",
+    "category": "Home & Living",
+    "description": "Beautiful home decor, furniture accessories, and lifestyle products to transform your living space into a haven.",
+    "whatsapp_link": "https://wa.me/c/2348078901234",
+    "hero_image": "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=1200",
+    "logo": "https://images.unsplash.com/photo-1567016432779-094069958ea5?auto=format&fit=crop&q=80&w=200",
+    "featured": true,
+    "products": [
+      { "code": "HOME001", "whatsapp_id": "8877665541", "name": "Scented Soy Candle Set", "price": 8500, "description": "Set of 3 luxury scented soy candles — vanilla, lavender and sandalwood.", "image": "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&q=80&w=800", "featured": true },
+      { "code": "HOME002", "whatsapp_id": "8877665542", "name": "Woven Wall Art", "price": 14000, "description": "Handmade boho woven wall art, 60x40cm, natural and terracotta tones.", "image": "https://images.unsplash.com/photo-1615529328331-f8917597711f?auto=format&fit=crop&q=80&w=800", "featured": true },
+      { "code": "HOME003", "whatsapp_id": "8877665543", "name": "Ceramic Vase Set (3pc)", "price": 18000, "description": "Set of 3 modern matte ceramic vases in complementary sizes.", "image": "https://images.unsplash.com/photo-1612198188060-c7c2a3b66eae?auto=format&fit=crop&q=80&w=800", "featured": true },
+      { "code": "HOME004", "whatsapp_id": "8877665544", "name": "LED Fairy Light String", "price": 5500, "description": "10m warm white LED fairy lights with remote control.", "image": "https://images.unsplash.com/photo-1512389142860-9c449e58a543?auto=format&fit=crop&q=80&w=800", "featured": false },
+      { "code": "HOME005", "whatsapp_id": "8877665545", "name": "Throw Pillow Covers (4pc)", "price": 9500, "description": "Premium velvet throw pillow covers in earthy tones, 45x45cm.", "image": "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&q=80&w=800", "featured": true },
+      { "code": "HOME006", "whatsapp_id": "8877665546", "name": "Bamboo Photo Frame Set", "price": 7200, "description": "Set of 5 minimalist bamboo photo frames in assorted sizes.", "image": "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&q=80&w=800", "featured": false }
+    ]
+  },
+  {
+    "id": "biz_010",
+    "name": "Mama's Kitchen",
+    "slug": "mamas-kitchen",
+    "category": "Food & Drinks",
+    "description": "Authentic Nigerian homemade meals, snacks, and packaged foods. Freshly made with love and traditional recipes.",
+    "whatsapp_link": "https://wa.me/c/2348090123456",
+    "hero_image": "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?auto=format&fit=crop&q=80&w=1200",
+    "logo": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&q=80&w=200",
+    "featured": true,
+    "products": [
+      { "code": "FOOD001", "whatsapp_id": "9988776651", "name": "Jollof Rice Party Pack", "price": 12000, "description": "Party jollof rice with assorted meats for 5-8 people.", "image": "https://images.unsplash.com/photo-1645177628172-a94c1f96debb?auto=format&fit=crop&q=80&w=800", "featured": true },
+      { "code": "FOOD002", "whatsapp_id": "9988776652", "name": "Chin Chin (1kg)", "price": 4500, "description": "Crunchy homemade Nigerian chin chin in coconut and plain flavours.", "image": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&q=80&w=800", "featured": true },
+      { "code": "FOOD003", "whatsapp_id": "9988776653", "name": "Puff Puff (30 pieces)", "price": 3500, "description": "Freshly made soft and fluffy Nigerian puff puff.", "image": "https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&q=80&w=800", "featured": true },
+      { "code": "FOOD004", "whatsapp_id": "9988776654", "name": "Zobo Drink (2 litres)", "price": 2800, "description": "Chilled hibiscus zobo drink with ginger and pineapple.", "image": "https://images.unsplash.com/photo-1563822249366-3efb23b8e0c9?auto=format&fit=crop&q=80&w=800", "featured": false },
+      { "code": "FOOD005", "whatsapp_id": "9988776655", "name": "Meat Pie (6 pieces)", "price": 4200, "description": "Freshly baked meat pies with savoury minced beef filling.", "image": "https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?auto=format&fit=crop&q=80&w=800", "featured": true },
+      { "code": "FOOD006", "whatsapp_id": "9988776656", "name": "Suya Spice Mix (100g)", "price": 2000, "description": "Authentic Hausa suya spice blend for grilling.", "image": "https://images.unsplash.com/photo-1532550907401-a500c9a57435?auto=format&fit=crop&q=80&w=800", "featured": false }
     ]
   }
 ]

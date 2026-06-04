@@ -5,6 +5,7 @@ import './index.css'
 import Landing from './pages/Landing'
 import Businesses from './pages/Businesses'
 import BusinessDetail from './pages/BusinessDetail'
+import SearchPage from './pages/Search'
 import Admin from './pages/Admin'
 import Header from './components/Header'
 import HowItWorks from './pages/HowItWorks'
@@ -72,7 +73,7 @@ function App() {
         body: JSON.stringify(checkoutData)
       };
 
-      const fetchWithTimeout = async (url, options = {}, timeout = 3000) => {
+      const fetchWithTimeout = async (url, options = {}, timeout = 20000) => {
         const controller = new AbortController();
         const id = setTimeout(() => controller.abort(), timeout);
         try {
@@ -157,6 +158,7 @@ function App() {
               }
             />
             <Route path="/how-it-works" element={<HowItWorks />} />
+            <Route path="/search" element={<ProtectedRoute><SearchPage onProductSynced={addToCart} /></ProtectedRoute>} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route
