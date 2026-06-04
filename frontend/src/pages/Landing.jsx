@@ -76,7 +76,7 @@ export default function Landing({ onProductSynced }) {
             The bridge between social browsing and secure checkout.
             Discover amazing local brands and complete your purchase seamlessly.
           </p>
-          <div style={{ display: 'flex', gap: '1rem' }}>
+          <div className="btn-group" style={{ display: 'flex', gap: '1rem' }}>
             <Link to="/businesses" className="btn btn-primary btn-large">
               Explore Shops <ArrowRight size={20} />
             </Link>
@@ -101,59 +101,60 @@ export default function Landing({ onProductSynced }) {
 
       {/* Featured Products */}
       <section className="section-padding" style={{ backgroundColor: 'var(--bg-main)' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '3rem' }}>
-          <div>
-            <h2 className="section-title" style={{ textAlign: 'left', marginBottom: '0.5rem' }}>Featured Products</h2>
-            <p style={{ color: 'var(--text-muted)' }}>Handpicked items from our top-rated businesses.</p>
+        <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2.5rem' }}>
+            <div>
+              <h2 className="section-title" style={{ textAlign: 'left', marginBottom: '0.5rem' }}>Featured Products</h2>
+              <p style={{ color: 'var(--text-muted)' }}>Handpicked items from our top-rated businesses.</p>
+            </div>
+            <Link to="/businesses" style={{ color: 'var(--accent)', fontWeight: 700, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0 }}>
+              View All <ArrowRight size={18} />
+            </Link>
           </div>
-          <Link to="/businesses" style={{ color: 'var(--accent)', fontWeight: 700, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            View All <ArrowRight size={18} />
-          </Link>
-        </div>
-
-        <div className="products-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '2rem' }}>
-          {loading ? (
-            <p>Loading products...</p>
-          ) : (
-            featuredProducts.map(product => (
-              <Link to={`/business/${product.business_slug}`} key={product.code} className="prod-card animate-fade" style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}>
-                <div className="prod-img-wrapper">
-                  <img src={product.image} alt={product.name} />
-                </div>
-                <div className="prod-info">
-                  <div style={{ fontSize: '0.875rem', color: 'var(--accent)', fontWeight: 700, marginBottom: '0.25rem' }}>{product.business_name}</div>
-                  <h3 style={{ fontSize: '1.25rem', marginBottom: '0.5rem' }}>{product.name}</h3>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div className="prod-price">₦{product.price.toLocaleString()}</div>
-                    <div className="btn btn-primary" style={{ padding: '0.5rem' }}>
-                      <ShoppingBag size={18} />
+          <div className="products-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem' }}>
+            {loading ? (
+              <p>Loading products...</p>
+            ) : (
+              featuredProducts.map(product => (
+                <Link to={`/business/${product.business_slug}`} key={product.code} className="prod-card animate-fade" style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}>
+                  <div className="prod-img-wrapper">
+                    <img src={product.image} alt={product.name} />
+                  </div>
+                  <div className="prod-info">
+                    <div style={{ fontSize: '0.8rem', color: 'var(--accent)', fontWeight: 700, marginBottom: '0.25rem' }}>{product.business_name}</div>
+                    <h3 style={{ fontSize: '1.1rem', marginBottom: '0.5rem' }}>{product.name}</h3>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div className="prod-price">₦{product.price.toLocaleString()}</div>
+                      <div className="btn btn-primary" style={{ padding: '0.4rem 0.75rem' }}><ShoppingBag size={16} /></div>
                     </div>
                   </div>
-                </div>
-              </Link>
-            ))
-          )}
+                </Link>
+              ))
+            )}
+          </div>
         </div>
       </section>
 
       {/* Categories */}
       <section className="section-padding" style={{ background: '#fff' }}>
-        <h2 className="section-title" style={{ textAlign: 'center' }}>Shop by Category</h2>
-        <div className="categories-grid" style={{ marginTop: '3rem' }}>
-          {[
-            { name: 'Wellness', icon: <Star size={32} />, color: '#ECFDF5', count: '15+ Stores' },
-            { name: 'Fitness', icon: <Dumbbell size={32} />, color: '#F5F3FF', count: '8+ Stores' },
-            { name: 'Fashion', icon: <ShoppingBag size={32} />, color: '#FFF7ED', count: '25+ Stores' },
-            { name: 'Beauty', icon: <Sparkles size={32} />, color: '#FEF2F2', count: '12+ Stores' },
-            { name: 'Electronics', icon: <TrendingUp size={32} />, color: '#F0F9FF', count: '18+ Stores' },
-            { name: 'Groceries', icon: <Star size={32} />, color: '#F0FDF4', count: '10+ Stores' },
-          ].map(cat => (
-            <Link to={`/businesses?category=${cat.name}`} key={cat.name} className="category-card" style={{ backgroundColor: cat.color, textDecoration: 'none', display: 'block' }}>
-              <div style={{ color: 'var(--accent)', marginBottom: '1rem', display: 'flex', justifyContent: 'center' }}>{cat.icon}</div>
-              <h3 style={{ fontSize: '1.125rem', marginBottom: '0.5rem', color: 'var(--text-main)' }}>{cat.name}</h3>
-              <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', margin: 0 }}>{cat.count}</p>
-            </Link>
-          ))}
+        <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
+          <h2 className="section-title" style={{ textAlign: 'center' }}>Shop by Category</h2>
+          <div className="categories-grid">
+            {[
+              { name: 'Wellness', icon: <Star size={28} />, color: '#ECFDF5', count: '15+ Stores' },
+              { name: 'Fitness', icon: <Dumbbell size={28} />, color: '#F5F3FF', count: '8+ Stores' },
+              { name: 'Fashion', icon: <ShoppingBag size={28} />, color: '#FFF7ED', count: '25+ Stores' },
+              { name: 'Beauty', icon: <Sparkles size={28} />, color: '#FEF2F2', count: '12+ Stores' },
+              { name: 'Electronics', icon: <TrendingUp size={28} />, color: '#F0F9FF', count: '18+ Stores' },
+              { name: 'Groceries', icon: <Star size={28} />, color: '#F0FDF4', count: '10+ Stores' },
+            ].map(cat => (
+              <Link to={`/businesses?category=${cat.name}`} key={cat.name} className="category-card" style={{ backgroundColor: cat.color }}>
+                <div style={{ color: 'var(--accent)', marginBottom: '0.75rem', display: 'flex', justifyContent: 'center' }}>{cat.icon}</div>
+                <h3 style={{ fontSize: '1rem', marginBottom: '0.25rem', color: 'var(--text-main)' }}>{cat.name}</h3>
+                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: 0 }}>{cat.count}</p>
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -197,27 +198,29 @@ export default function Landing({ onProductSynced }) {
       </section>
 
       {/* Top Businesses */}
-      <section className="section-padding">
-        <h2 className="section-title" style={{ textAlign: 'center' }}>Top Rated Businesses</h2>
-        <div className="business-grid" style={{ marginTop: '3rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '2rem' }}>
-          {featuredBusinesses.map(biz => (
-            <Link to={`/business/${biz.slug}`} key={biz.id} style={{ textDecoration: 'none', color: 'inherit' }}>
-              <div className="biz-card">
-                <div className="biz-card-banner">
-                  <img src={biz.hero_image} alt={biz.name} />
-                  <img src={biz.logo} alt={biz.name} className="biz-card-logo" />
+      <section className="section-padding" style={{ background: 'var(--bg-main)' }}>
+        <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
+          <h2 className="section-title" style={{ textAlign: 'center' }}>Top Rated Businesses</h2>
+          <div className="business-grid" style={{ marginTop: '2.5rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '2rem' }}>
+            {featuredBusinesses.map(biz => (
+              <Link to={`/business/${biz.slug}`} key={biz.id} style={{ textDecoration: 'none', color: 'inherit' }}>
+                <div className="biz-card">
+                  <div className="biz-card-banner">
+                    <img src={biz.hero_image} alt={biz.name} />
+                    <img src={biz.logo} alt={biz.name} className="biz-card-logo" />
+                  </div>
+                  <div className="biz-card-body">
+                    <div className="biz-card-category">{biz.category}</div>
+                    <h3 style={{ fontSize: '1.35rem', marginBottom: '0.6rem' }}>{biz.name}</h3>
+                    <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', marginBottom: '1.25rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                      {biz.description}
+                    </p>
+                    <div className="btn btn-outline" style={{ width: '100%' }}>View Store</div>
+                  </div>
                 </div>
-                <div className="biz-card-body">
-                  <div className="biz-card-category">{biz.category}</div>
-                  <h3 style={{ fontSize: '1.5rem', marginBottom: '0.75rem' }}>{biz.name}</h3>
-                  <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', marginBottom: '1.5rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                    {biz.description}
-                  </p>
-                  <div className="btn btn-outline" style={{ width: '100%' }}>View Store</div>
-                </div>
-              </div>
-            </Link>
-          ))}
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
 
