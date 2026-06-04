@@ -67,22 +67,11 @@ export default function Landing({ onProductSynced }) {
       <section className="hero">
         <div className="hero-text animate-fade">
           <div className="badge badge-accent" style={{ marginBottom: '1rem', display: 'inline-block' }}>New Way to Shop</div>
-          <h1>
-            Your Favorite <br />
-            <span style={{ color: 'var(--accent)' }}>WhatsApp Stores</span>, <br />
-            Now Synchronized.
-          </h1>
-          <p>
-            The bridge between social browsing and secure checkout.
-            Discover amazing local brands and complete your purchase seamlessly.
-          </p>
+          <h1>Shop WhatsApp<br /><span style={{ color: 'var(--accent)' }}>Stores</span> Seamlessly.</h1>
+          <p>Browse local businesses, sync products from their WhatsApp catalog, and checkout — all in one place.</p>
           <div className="btn-group" style={{ display: 'flex', gap: '1rem' }}>
-            <Link to="/businesses" className="btn btn-primary btn-large">
-              Explore Shops <ArrowRight size={20} />
-            </Link>
-            <Link to="/how-it-works" className="btn btn-outline btn-large">
-              How it Works
-            </Link>
+            <Link to="/businesses" className="btn btn-primary btn-large">Explore Shops <ArrowRight size={20} /></Link>
+            <Link to="/how-it-works" className="btn btn-outline btn-large">How it Works</Link>
           </div>
         </div>
         <div className="hero-image animate-fade" style={{ animationDelay: '0.2s' }}>
