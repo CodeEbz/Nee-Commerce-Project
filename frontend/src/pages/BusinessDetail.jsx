@@ -4,6 +4,16 @@ import { ArrowLeft, ExternalLink, ShoppingBag, Zap, Star, MapPin, Clock, Package
 import SyncStation from '../components/SyncStation';
 import { API_URL } from '../config';
 
+const Step = ({ number, color, title }) => (
+  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
+    <div style={{
+      background: color, color: 'white', width: '32px', height: '32px', borderRadius: '50%',
+      display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, flexShrink: 0, fontSize: '0.9rem'
+    }}>{number}</div>
+    <h2 style={{ fontSize: 'clamp(1rem, 3vw, 1.4rem)', margin: 0 }}>{title}</h2>
+  </div>
+);
+
 export default function BusinessDetail({ onProductSynced }) {
   const { slug } = useParams();
   const [business, setBusiness] = useState(null);
@@ -11,18 +21,11 @@ export default function BusinessDetail({ onProductSynced }) {
   const [syncedResults, setSyncedResults] = useState([]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await fetch(`${API_URL}/businesses`);
-        const data = await res.json();
-        setBusiness(data.find(b => b.slug === slug) || null);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
+    fetch(`${API_URL}/businesses`)
+      .then(r => r.json())
+      .then(data => setBusiness(data.find(b => b.slug === slug) || null))
+      .catch(console.error)
+      .finally(() => setLoading(false));
   }, [slug]);
 
   const handleManualSync = (product) => setSyncedResults(prev => [product, ...prev]);
@@ -34,8 +37,8 @@ export default function BusinessDetail({ onProductSynced }) {
   if (loading) return (
     <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div style={{ textAlign: 'center' }}>
-        <div style={{ width: '40px', height: '40px', border: '3px solid var(--accent)', borderTop: '3px solid transparent', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 1rem' }}></div>
-        <p style={{ color: 'var(--text-muted)' }}>Loading Store...</p>
+        <div style={{ width: '36px', height: '36px', border: '3px solid var(--accent)', borderTop: '3px solid transparent', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 1rem' }} />
+        <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Loading Store...</p>
       </div>
     </div>
   );
@@ -51,99 +54,93 @@ export default function BusinessDetail({ onProductSynced }) {
 
   return (
     <div>
-      {/* Hero Banner */}
+      {/* ── Hero Banner ── */}
       <div style={{
         position: 'relative',
-        height: 'clamp(220px, 40vw, 420px)',
-        background: `linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.7)), url(${business.hero_image}) center/cover no-repeat`,
+        height: 'clamp(200px, 38vw, 400px)',
+        background: `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.72)), url(${business.hero_image}) center/cover no-repeat`,
       }}>
-        <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', padding: 'clamp(1rem, 4vw, 3rem)' }}>
+        <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', padding: 'clamp(1rem, 4vw, 2.5rem)' }}>
           <Link to="/businesses" style={{
             color: 'white', textDecoration: 'none', display: 'inline-flex', alignItems: 'center',
-            gap: '0.5rem', background: 'rgba(255,255,255,0.15)', padding: '0.4rem 1rem',
-            borderRadius: 'var(--radius-full)', width: 'fit-content', marginBottom: '1.5rem',
-            fontSize: '0.9rem', fontWeight: 600, backdropFilter: 'blur(8px)'
+            gap: '0.4rem', background: 'rgba(255,255,255,0.15)', padding: '0.35rem 0.9rem',
+            borderRadius: 'var(--radius-full)', width: 'fit-content', marginBottom: '1.25rem',
+            fontSize: '0.85rem', fontWeight: 600, backdropFilter: 'blur(8px)'
           }}>
-            <ArrowLeft size={16} /> Back
+            <ArrowLeft size={15} /> Back
           </Link>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(0.75rem, 3vw, 1.5rem)', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(0.6rem, 3vw, 1.25rem)' }}>
             <img src={business.logo} alt={business.name} style={{
-              width: 'clamp(56px, 12vw, 90px)', height: 'clamp(56px, 12vw, 90px)',
+              width: 'clamp(52px, 11vw, 80px)', height: 'clamp(52px, 11vw, 80px)',
               borderRadius: '50%', border: '3px solid white', objectFit: 'cover',
-              background: 'white', flexShrink: 0, boxShadow: '0 4px 20px rgba(0,0,0,0.3)'
+              background: 'white', flexShrink: 0
             }} />
             <div>
-              <span style={{ background: 'rgba(59,130,246,0.25)', color: '#93C5FD', padding: '0.2rem 0.75rem', borderRadius: 'var(--radius-full)', fontSize: '0.75rem', fontWeight: 700 }}>
+              <span style={{ background: 'rgba(59,130,246,0.3)', color: '#93C5FD', padding: '0.15rem 0.6rem', borderRadius: 'var(--radius-full)', fontSize: '0.7rem', fontWeight: 700 }}>
                 {business.category}
               </span>
-              <h1 style={{ color: 'white', fontSize: 'clamp(1.4rem, 5vw, 2.75rem)', margin: '0.4rem 0 0.5rem', lineHeight: 1.1 }}>
+              <h1 style={{ color: 'white', fontSize: 'clamp(1.25rem, 4.5vw, 2.5rem)', margin: '0.3rem 0 0.4rem', lineHeight: 1.1 }}>
                 {business.name}
               </h1>
               <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-                <span style={{ color: 'rgba(255,255,255,0.85)', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                  <Star size={14} fill="#F59E0B" color="#F59E0B" /> 4.9
-                </span>
-                <span style={{ color: 'rgba(255,255,255,0.85)', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                  <MapPin size={14} /> Lagos, NG
-                </span>
-                <span style={{ color: '#34D399', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                  <Zap size={14} /> Sync Ready
-                </span>
+                {[
+                  { icon: <Star size={13} fill="#F59E0B" color="#F59E0B" />, label: '4.9', color: 'rgba(255,255,255,0.85)' },
+                  { icon: <MapPin size={13} />, label: 'Lagos, NG', color: 'rgba(255,255,255,0.85)' },
+                  { icon: <Zap size={13} />, label: 'Sync Ready', color: '#34D399' },
+                ].map(({ icon, label, color }) => (
+                  <span key={label} style={{ color, fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                    {icon} {label}
+                  </span>
+                ))}
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Body */}
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: 'clamp(1.25rem, 4vw, 3rem)' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1.5fr) minmax(0,1fr)', gap: '2.5rem', alignItems: 'start' }} className="biz-detail-grid">
+      {/* ── Page Body ── */}
+      <div style={{ maxWidth: '1100px', margin: '0 auto', padding: 'clamp(1rem, 4vw, 2.5rem)' }}>
 
-          {/* Main Column */}
-          <div>
-            {/* Step 1 */}
-            <div className="glass" style={{ padding: 'clamp(1.25rem, 4vw, 2rem)', borderRadius: 'var(--radius-lg)', marginBottom: '1.5rem', border: '2px solid var(--accent)', background: 'linear-gradient(135deg, rgba(59,130,246,0.04), transparent)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-                <div style={{ background: 'var(--accent)', color: 'white', width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, flexShrink: 0 }}>1</div>
-                <h2 style={{ fontSize: 'clamp(1.1rem, 3vw, 1.5rem)', margin: 0 }}>Browse WhatsApp Catalog</h2>
-              </div>
-              <p style={{ color: 'var(--text-muted)', marginBottom: '1.25rem', lineHeight: 1.6, fontSize: '0.95rem' }}>
+        {/* On desktop: sidebar on the right. On mobile: everything stacks */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1.6fr) minmax(0,1fr)', gap: '2rem', alignItems: 'start' }} className="biz-detail-grid">
+
+          {/* ── LEFT / MAIN ── */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+
+            {/* Step 1 — WhatsApp Catalog */}
+            <div style={{ background: 'white', borderRadius: 'var(--radius-lg)', padding: 'clamp(1rem, 3vw, 1.75rem)', border: '1.5px solid var(--accent)', boxShadow: 'var(--shadow-sm)' }}>
+              <Step number="1" color="var(--accent)" title="Browse WhatsApp Catalog" />
+              <p style={{ color: 'var(--text-muted)', marginBottom: '1rem', lineHeight: 1.6, fontSize: '0.9rem' }}>
                 Open the store's WhatsApp catalog, find a product you like, and copy its link.
               </p>
               <a href={business.whatsapp_link || '#'} target="_blank" rel="noopener noreferrer"
-                className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', background: '#25D366', padding: '0.9rem', fontSize: '1rem' }}>
-                <ExternalLink size={18} /> Open WhatsApp Catalog
+                className="btn" style={{ width: '100%', justifyContent: 'center', background: '#25D366', color: 'white', padding: '0.85rem', fontSize: '0.95rem', borderRadius: 'var(--radius-md)' }}>
+                <ExternalLink size={17} /> Open WhatsApp Catalog
               </a>
             </div>
 
-            {/* Step 2 */}
-            <div style={{ marginBottom: '1.5rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-                <div style={{ background: '#F59E0B', color: 'white', width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, flexShrink: 0 }}>2</div>
-                <h2 style={{ fontSize: 'clamp(1.1rem, 3vw, 1.5rem)', margin: 0 }}>Sync Your Selection</h2>
-              </div>
+            {/* Step 2 — Sync */}
+            <div style={{ background: 'white', borderRadius: 'var(--radius-lg)', padding: 'clamp(1rem, 3vw, 1.75rem)', border: '1.5px solid #F59E0B', boxShadow: 'var(--shadow-sm)' }}>
+              <Step number="2" color="#F59E0B" title="Sync Your Selection" />
               <SyncStation onProductSynced={handleManualSync} />
             </div>
 
-            {/* Step 3 — synced results */}
+            {/* Step 3 — Synced Results */}
             {syncedResults.length > 0 && (
-              <div className="animate-fade" style={{ marginBottom: '1.5rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-                  <div style={{ background: '#10B981', color: 'white', width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, flexShrink: 0 }}>3</div>
-                  <h2 style={{ fontSize: 'clamp(1.1rem, 3vw, 1.5rem)', margin: 0 }}>Add to Cart</h2>
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '1rem' }}>
+              <div className="animate-fade" style={{ background: 'white', borderRadius: 'var(--radius-lg)', padding: 'clamp(1rem, 3vw, 1.75rem)', border: '1.5px solid #10B981', boxShadow: 'var(--shadow-sm)' }}>
+                <Step number="3" color="#10B981" title="Add to Cart" />
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.75rem' }}>
                   {syncedResults.map((product, idx) => (
-                    <div key={`${product.code}-${idx}`} className="prod-card" style={{ border: '2px solid #10B981' }}>
-                      <div className="prod-img-wrapper">
-                        <img src={product.image} alt={product.name} />
+                    <div key={`${product.code}-${idx}`} style={{ background: '#F0FDF4', borderRadius: 'var(--radius-md)', overflow: 'hidden', border: '1px solid #BBF7D0' }}>
+                      <div style={{ aspectRatio: '1/1', overflow: 'hidden' }}>
+                        <img src={product.image} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                       </div>
-                      <div className="prod-info">
-                        <h3 style={{ fontSize: '1rem', marginBottom: '0.4rem' }}>{product.name}</h3>
-                        <div className="prod-price" style={{ fontSize: '1.2rem', marginBottom: '0.75rem' }}>₦{product.price.toLocaleString()}</div>
-                        <button onClick={() => handleAddToCart(product)} className="btn btn-primary" style={{ width: '100%', background: '#10B981', padding: '0.65rem', fontSize: '0.9rem' }}>
-                          <ShoppingBag size={16} /> Add to Cart
+                      <div style={{ padding: '0.75rem' }}>
+                        <p style={{ fontWeight: 700, fontSize: '0.9rem', marginBottom: '0.2rem' }}>{product.name}</p>
+                        <p style={{ color: 'var(--accent)', fontWeight: 800, fontSize: '1rem', marginBottom: '0.5rem' }}>₦{product.price.toLocaleString()}</p>
+                        <button onClick={() => handleAddToCart(product)} className="btn btn-primary"
+                          style={{ width: '100%', padding: '0.55rem', fontSize: '0.8rem', background: '#10B981' }}>
+                          <ShoppingBag size={14} /> Add to Cart
                         </button>
                       </div>
                     </div>
@@ -153,19 +150,21 @@ export default function BusinessDetail({ onProductSynced }) {
             )}
 
             {/* Store Showcase */}
-            <div>
-              <h2 style={{ fontSize: 'clamp(1.1rem, 3vw, 1.5rem)', marginBottom: '0.5rem' }}>Store Showcase</h2>
-              <p style={{ color: 'var(--text-muted)', marginBottom: '1.25rem', fontSize: '0.9rem' }}>Browse available products — sync any item to add it to your cart.</p>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '1rem' }}>
+            <div style={{ background: 'white', borderRadius: 'var(--radius-lg)', padding: 'clamp(1rem, 3vw, 1.75rem)', border: '1px solid #E5E7EB', boxShadow: 'var(--shadow-sm)' }}>
+              <h2 style={{ fontSize: 'clamp(1rem, 3vw, 1.35rem)', marginBottom: '0.35rem' }}>Store Showcase</h2>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '1.25rem' }}>
+                Sync any product ID above to add it to your cart.
+              </p>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.75rem' }}>
                 {business.products.map(product => (
-                  <div key={product.code} className="prod-card">
-                    <div className="prod-img-wrapper">
-                      <img src={product.image} alt={product.name} />
+                  <div key={product.code} style={{ background: 'var(--bg-main)', borderRadius: 'var(--radius-md)', overflow: 'hidden', border: '1px solid #E5E7EB' }}>
+                    <div style={{ aspectRatio: '1/1', overflow: 'hidden' }}>
+                      <img src={product.image} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                     </div>
-                    <div className="prod-info" style={{ padding: '1rem' }}>
-                      <h3 style={{ fontSize: '0.95rem', marginBottom: '0.3rem' }}>{product.name}</h3>
-                      <div className="prod-price" style={{ fontSize: '1.1rem', marginBottom: '0.25rem' }}>₦{product.price.toLocaleString()}</div>
-                      <div style={{ fontSize: '0.7rem', color: 'var(--accent)', fontWeight: 600 }}>ID: {product.whatsapp_id || product.code}</div>
+                    <div style={{ padding: '0.75rem' }}>
+                      <p style={{ fontWeight: 700, fontSize: '0.875rem', marginBottom: '0.2rem', lineHeight: 1.3 }}>{product.name}</p>
+                      <p style={{ color: 'var(--accent)', fontWeight: 800, fontSize: '0.95rem', marginBottom: '0.25rem' }}>₦{product.price.toLocaleString()}</p>
+                      <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>ID: {product.whatsapp_id || product.code}</p>
                     </div>
                   </div>
                 ))}
@@ -173,23 +172,25 @@ export default function BusinessDetail({ onProductSynced }) {
             </div>
           </div>
 
-          {/* Sidebar */}
-          <aside>
+          {/* ── RIGHT / SIDEBAR ── */}
+          <aside style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }} className="biz-sidebar">
             <div style={{ position: 'sticky', top: '80px', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-              <div className="glass" style={{ padding: '1.5rem', borderRadius: 'var(--radius-lg)' }}>
-                <h3 style={{ marginBottom: '1.25rem', fontSize: '1.1rem' }}>Store Info</h3>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem', fontSize: '0.9rem' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}><Clock size={15} color="var(--accent)" /> Open 24/7</div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}><Package size={15} color="var(--accent)" /> {business.products.length} Products</div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}><Zap size={15} color="#10B981" /><span style={{ color: '#10B981' }}>Sync Verified</span></div>
+              {/* Store Info */}
+              <div style={{ background: 'white', borderRadius: 'var(--radius-lg)', padding: '1.5rem', border: '1px solid #E5E7EB', boxShadow: 'var(--shadow-sm)' }}>
+                <h3 style={{ marginBottom: '1.25rem', fontSize: '1rem', fontWeight: 700 }}>Store Info</h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem', fontSize: '0.875rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}><Clock size={15} color="var(--accent)" /><span>Open 24/7</span></div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}><Package size={15} color="var(--accent)" /><span>{business.products.length} Products Available</span></div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}><Zap size={15} color="#10B981" /><span style={{ color: '#10B981', fontWeight: 600 }}>Sync Verified</span></div>
                 </div>
               </div>
-              <div className="glass" style={{ padding: '1.5rem', borderRadius: 'var(--radius-lg)' }}>
-                <h3 style={{ marginBottom: '1.25rem', fontSize: '1.1rem' }}>Shop Policies</h3>
-                <ul style={{ padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.75rem', fontSize: '0.875rem' }}>
+              {/* Policies */}
+              <div style={{ background: 'white', borderRadius: 'var(--radius-lg)', padding: '1.5rem', border: '1px solid #E5E7EB', boxShadow: 'var(--shadow-sm)' }}>
+                <h3 style={{ marginBottom: '1.25rem', fontSize: '1rem', fontWeight: 700 }}>Shop Policies</h3>
+                <ul style={{ padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.7rem', fontSize: '0.875rem' }}>
                   {['7-day return policy', 'Secure payments', 'Fast delivery', '24/7 support'].map(p => (
-                    <li key={p} style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-                      <div style={{ width: '6px', height: '6px', background: '#10B981', borderRadius: '50%', flexShrink: 0 }}></div>
+                    <li key={p} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <div style={{ width: '6px', height: '6px', background: '#10B981', borderRadius: '50%', flexShrink: 0 }} />
                       {p}
                     </li>
                   ))}
@@ -199,6 +200,17 @@ export default function BusinessDetail({ onProductSynced }) {
           </aside>
         </div>
       </div>
+
+      <style>{`
+        @media (max-width: 768px) {
+          .biz-detail-grid {
+            grid-template-columns: 1fr !important;
+          }
+          .biz-sidebar > div {
+            position: static !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }
