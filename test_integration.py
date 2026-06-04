@@ -6,8 +6,10 @@ This script demonstrates the WhatsApp product link parsing functionality.
 
 import requests
 import json
+import os
 
-BASE_URL = "http://localhost:8000"
+BASE_URL = os.getenv("BASE_URL", "http://localhost:8000")
+
 
 def test_whatsapp_sync():
     """Test the WhatsApp sync functionality with various link formats."""
@@ -126,13 +128,43 @@ def test_checkout_flow():
         print(f"❌ CHECKOUT ERROR: {e}")
         return False
 
+def get_auth_token():
+    """Gets an admin authentication token by logging in or signing up."""
+    email = "ebzchin@gmail.com"
+    password = "password123"
+    try:
+        login_res = requests.post(f"{BASE_URL}/token", data={"username": email, "password": password})
+        if login_res.status_code == 200:
+            return login_res.json().get("access_token")
+    except Exception:
+        pass
+    try:
+        requests.post(f"{BASE_URL}/auth/signup", json={
+            "email": email,
+            "nickname": "admin",
+            "password": password,
+            "full_name": "Ebz Chin"
+        })
+        login_res = requests.post(f"{BASE_URL}/token", data={"username": email, "password": password})
+        if login_res.status_code == 200:
+            return login_res.json().get("access_token")
+    except Exception as e:
+        print(f"Auth helper failed: {e}")
+    return None
+
 def test_orders_endpoint():
     """Test the orders endpoint."""
     
     print("\n📊 Testing Orders Endpoint\n")
     
+    token = get_auth_token()
+    if not token:
+        print("❌ AUTHENTICATION FAILED: Could not retrieve token")
+        return False
+        
+    headers = {"Authorization": f"Bearer {token}"}
     try:
-        response = requests.get(f"{BASE_URL}/orders")
+        response = requests.get(f"{BASE_URL}/orders", headers=headers)
         
         if response.status_code == 200:
             orders = response.json()
@@ -153,6 +185,7 @@ def test_orders_endpoint():
     except Exception as e:
         print(f"❌ ORDERS ERROR: {e}")
         return False
+
 
 def main():
     """Run all tests."""

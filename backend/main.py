@@ -395,6 +395,32 @@ async def initialize_payment(request: Request, checkout_data: CheckoutRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Payment initialization failed: {str(e)}")
 
+@app.post("/checkout")
+async def process_checkout(checkout_data: CheckoutRequest):
+    db = get_database()
+    try:
+        order_id = f"ORD-{int(time.time())}"
+        new_order = {
+            "_id": order_id,
+            "customer_name": checkout_data.customer_name,
+            "customer_email": checkout_data.customer_email,
+            "customer_phone": checkout_data.customer_phone,
+            "total_amount": checkout_data.total_amount,
+            "payment_method": checkout_data.payment_method,
+            "status": "completed",
+            "created_at": datetime.utcnow(),
+            "items": [item.dict() for item in checkout_data.items]
+        }
+        await db.orders.insert_one(new_order)
+        return {
+            "status": "success",
+            "order_id": order_id,
+            "total": checkout_data.total_amount
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.post("/webhook/paystack")
 async def paystack_webhook(request: Request):
     db = get_database()

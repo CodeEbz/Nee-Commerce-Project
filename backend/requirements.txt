@@ -1,11 +1,12 @@
 fastapi
-uvicorn
+uvicorn[standard]
 pydantic
-requests
-python-dotenv
+python-multipart
 motor
 dnspython
-python-multipart
 passlib[bcrypt]
 python-jose[cryptography]
 email-validator
+bcrypt
+python-dotenv
+requests
