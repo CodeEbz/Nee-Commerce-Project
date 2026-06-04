@@ -223,18 +223,18 @@ function CheckoutModal({ cart, onClose, onCheckout, onUpdateQuantity, onRemoveIt
       inset: 0,
       background: 'rgba(0,0,0,0.5)',
       display: 'flex',
-      alignItems: 'center',
+      alignItems: 'flex-end',
       justifyContent: 'center',
       zIndex: 2000,
-      padding: '2rem'
+      padding: '0'
     }}>
-      <div className="glass" style={{
+      <div className="checkout-modal-inner glass" style={{
         background: 'white',
-        borderRadius: 'var(--radius-xl)',
+        borderRadius: 'var(--radius-lg) var(--radius-lg) 0 0',
         padding: '2rem',
-        maxWidth: '600px',
         width: '100%',
-        maxHeight: '80vh',
+        maxWidth: '600px',
+        maxHeight: '92vh',
         overflow: 'auto'
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>

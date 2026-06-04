@@ -142,7 +142,7 @@ export default function BusinessDetail({ onProductSynced }) {
         </div>
       </header>
 
-      <div className="app-container" style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '4rem', padding: '4rem 2rem' }}>
+      <div className="app-container biz-detail-grid" style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '4rem', padding: '4rem 2rem' }}>
         <main>
           {/* Enhanced Step 1 */}
           <section className="glass" style={{

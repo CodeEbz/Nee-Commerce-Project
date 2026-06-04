@@ -233,7 +233,7 @@ export default function MerchantDashboard() {
           <Link to="/" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
             <ArrowLeft size={20} /> Back to Store
           </Link>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }} className="merchant-header-row">
             <div>
               <h1 style={{ fontSize: '2rem', margin: 0 }}>
                 Merchant Dashboard
@@ -308,7 +308,7 @@ export default function MerchantDashboard() {
         ) : (
           <>
             {/* Tabs */}
-            <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', overflowX: 'auto', paddingBottom: '0.5rem' }}>
+            <div className="merchant-tabs" style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', overflowX: 'auto', paddingBottom: '0.5rem', WebkitOverflowScrolling: 'touch' }}>
               <button
                 onClick={() => setActiveTab('inventory')}
                 className={`btn ${activeTab === 'inventory' ? 'btn-primary' : 'btn-outline'}`}
